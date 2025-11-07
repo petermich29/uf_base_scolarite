@@ -284,12 +284,12 @@ class Inscription(Base):
 class ResultatSemestre(Base):
     """
     Table stockant le statut final de validation d'un semestre pour un étudiant, 
-    résultant de l'application des règles de compensation et de capitalisation.
+    incluant la moyenne et les crédits acquis (pour l'analyse de compensation).
     """
     __tablename__ = 'resultats_semestre'
     __table_args__ = (
-        # Clé composite pour garantir l'unicité du résultat par étudiant, semestre et année.
-        UniqueConstraint('code_etudiant', 'code_semestre', 'annee_universitaire', name='uq_resultat_semestre'),
+        # 🚨 MISE À JOUR DE LA CONTRAINTE D'UNICITÉ : Ajout de 'code_session' 🚨
+        UniqueConstraint('code_etudiant', 'code_semestre', 'annee_universitaire', 'code_session', name='uq_resultat_semestre_session'),
     )
     
     id_resultat = Column(Integer, primary_key=True, autoincrement=True)
@@ -299,26 +299,27 @@ class ResultatSemestre(Base):
     code_semestre = Column(String(50), ForeignKey('semestres.code_semestre'), nullable=False)
     annee_universitaire = Column(String(10), ForeignKey('annees_universitaires.annee'), nullable=False)
     
-    # 🚨 Champ 1 : L'indicateur de validation finale 🚨
-    # 'V' (Validé), 'NV' (Non Validé) ou 'AJ' (Ajourné)
+    # 🚨 AJOUT DE LA CLÉ ÉTRANGÈRE VERS LA SESSION D'EXAMEN 🚨
+    code_session = Column(String(5), ForeignKey('sessions_examen.code_session'), nullable=False)
+    
+    # Indicateur de validation (V, NV, AJ)
     statut_validation = Column(String(5), 
                                CheckConstraint("statut_validation IN ('V', 'NV', 'AJ')", name='check_statut_validation'), 
                                nullable=False)
     
-    # 🚨 Champ 2 : Crédits Réellement Acquis pour ce semestre 🚨
-    # Cela permet de savoir si la validation est due à l'obtention des 30 crédits ou à la compensation.
-    credits_acquis = Column(Numeric(4, 1)) # Par exemple, 25.5 crédits sur 30
-    
-    # 🚨 Champ 3 : Moyenne obtenue (conservé et crucial) 🚨
+    # Informations de performance
+    credits_acquis = Column(Numeric(4, 1)) # Ex: 25.5 crédits sur 30
     moyenne_obtenue = Column(Numeric(4, 2)) # Ex: 9.85/20
     
-    # Relations (pour les requêtes SQLAlchemy)
+    # Relations
     etudiant = relationship("Etudiant", backref="resultats_semestre")
     semestre = relationship("Semestre")
+    # 🚨 RELATION VERS LA SESSION 🚨
+    session = relationship("SessionExamen", backref="resultats_semestre") 
 
     def __repr__(self):
         return (f"<ResultatSemestre {self.code_etudiant} - {self.code_semestre} "
-                f"(Moy: {self.moyenne_obtenue}, Crédits: {self.credits_acquis}): {self.statut_validation}>")    
+                f"(Sess: {self.code_session}, Moy: {self.moyenne_obtenue}): {self.statut_validation}>")   
 
 class Note(Base):
     __tablename__ = 'notes'
