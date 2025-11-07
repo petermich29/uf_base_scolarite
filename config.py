@@ -3,7 +3,7 @@
 from sqlalchemy.engine.url import URL
 
 # --- Paramètres de connexion PostgreSQL ---
-DB_NAME = "db_uf"
+DB_NAME = "db_sco"
 DB_USER = "postgres"
 DB_PASS = "5864"# À VÉRIFIER
 DB_HOST = "localhost" 

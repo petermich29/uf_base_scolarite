@@ -1,46 +1,29 @@
-# models.py (Mis à jour pour inclure la table Institution)
+# models.py
 
 from sqlalchemy import (
-    Column, Integer, String, Date, ForeignKey, 
-    UniqueConstraint, Text 
+    Column, Integer, String, Date, Numeric, ForeignKey, 
+    UniqueConstraint, Text, Boolean, CheckConstraint 
 )
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
 
 # Définition de la base déclarative pour SQLAlchemy
 Base = declarative_base()
 
-
-# -------------------------------------------------------------------
-# --- NOUVELLE TABLE DE RÉFÉRENCE: INSTITUTION ----------------------
-# -------------------------------------------------------------------
+# ===================================================================
+# --- TABLES DE RÉFÉRENCE: HIERARCHIE ADMINISTRATIVE ET ACADÉMIQUE ---
+# ===================================================================
 
 class Institution(Base):
     __tablename__ = 'institutions'
     __table_args__ = {'extend_existing': True}
     
-    # Clé Primaire : Identifiant unique de l'institution
     id_institution = Column(String(32), primary_key=True) 
-    
-    # Nom de l'institution (Ex: Université de Fianarantsoa)
     nom = Column(String(255), nullable=False, unique=True)
-    
-    # Type : 'Public' ou 'Privé'
     type_institution = Column(String(10), nullable=False)
-    
-    # Champ de description libre
     description = Column(Text, nullable=True)
     
-    # Relation : Une institution peut avoir plusieurs composantes
     composantes = relationship("Composante", back_populates="institution")
-    
-    # Remarque : Les champs de métadonnées (date_creation) ont été omis pour coller 
-    # au style des autres tables du fichier (simplicité).
 
-
-# -------------------------------------------------------------------
-# --- TABLES DE RÉFÉRENCE (MÉTA-DONNÉES ACADÉMIQUES) ---
-# -------------------------------------------------------------------
 
 class Composante(Base):
     __tablename__ = 'composantes'
@@ -50,10 +33,7 @@ class Composante(Base):
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
-    # NOUVELLE CLÉ ÉTRANGÈRE vers l'Institution
-    id_institution = Column(String(32), ForeignKey('institutions.id_institution'), nullable=True) 
-    
-    # NOUVELLE RELATION vers l'Institution
+    id_institution = Column(String(32), ForeignKey('institutions.id_institution'), nullable=False) 
     institution = relationship("Institution", back_populates="composantes")
     
     mentions = relationship("Mention", backref="composante")
@@ -72,34 +52,145 @@ class Domaine(Base):
 
 class Mention(Base):
     __tablename__ = 'mentions'
-    __table_args__ = {'extend_existing': True} 
+    __table_args__ = (
+        UniqueConstraint('code_mention', 'composante_code', name='unique_mention_code_composante'),
+        {'extend_existing': True}
+    )
     
     id_mention = Column(String(50), primary_key=True) 
-    
-    code_mention = Column(String(20))
+    code_mention = Column(String(20), nullable=False)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
-    composante_code = Column(String(10), ForeignKey('composantes.code'))
-    domaine_code = Column(String(10), ForeignKey('domaines.code'))
+    composante_code = Column(String(10), ForeignKey('composantes.code'), nullable=False)
+    domaine_code = Column(String(10), ForeignKey('domaines.code'), nullable=False)
     
     parcours = relationship("Parcours", backref="mention")
 
 
 class Parcours(Base):
     __tablename__ = 'parcours'
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        UniqueConstraint('code_parcours', 'mention_id', name='unique_parcours_code_mention'),
+        {'extend_existing': True}
+    )
     
     id_parcours = Column(String(50), primary_key=True)
-    code_parcours = Column(String(20))
+    code_parcours = Column(String(20), nullable=False)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
-    mention_id = Column(String(50), ForeignKey('mentions.id_mention'))
+    mention_id = Column(String(50), ForeignKey('mentions.id_mention'), nullable=False)
     
     date_creation = Column(Integer, nullable=True)
     date_fin = Column(Integer, nullable=True)
 
+# -------------------------------------------------------------------
+# --- TABLES DE RÉFÉRENCE: STRUCTURE LMD (CYCLE, NIVEAU, SEMESTRE) ---
+# -------------------------------------------------------------------
+
+class Cycle(Base):
+    __tablename__ = 'cycles'
+    __table_args__ = {'extend_existing': True}
+    
+    code = Column(String(10), primary_key=True)
+    label = Column(String(50), unique=True, nullable=False)
+    
+    niveaux = relationship("Niveau", back_populates="cycle")
+    suivi_credits = relationship("SuiviCreditCycle", back_populates="cycle") # Ajout relation
+
+class Niveau(Base):
+    __tablename__ = 'niveaux'
+    __table_args__ = {'extend_existing': True}
+    
+    code = Column(String(10), primary_key=True)
+    label = Column(String(50)) 
+    
+    cycle_code = Column(String(10), ForeignKey('cycles.code'), nullable=False)
+    cycle = relationship("Cycle", back_populates="niveaux")
+    
+    semestres = relationship("Semestre", back_populates="niveau")
+    
+class Semestre(Base):
+    __tablename__ = 'semestres'
+    __table_args__ = (
+        # Réintroduction de la contrainte pour assurer la cohérence des codes L1_S01
+        UniqueConstraint('niveau_code', 'numero_semestre', name='uq_niveau_numero_semestre'), 
+        {'extend_existing': True}
+    )
+    
+    code_semestre = Column(String(10), primary_key=True) # Ex: L1_S01
+    numero_semestre = Column(String(10), nullable=False) # Ex: S01
+    
+    niveau_code = Column(String(10), ForeignKey('niveaux.code'), nullable=False)
+    niveau = relationship("Niveau", back_populates="semestres")
+    
+    inscriptions = relationship("Inscription", back_populates="semestre")
+    unites_enseignement = relationship("UniteEnseignement", back_populates="semestre") # Correction back_populates
+
+# -------------------------------------------------------------------
+# --- TABLES DE RÉFÉRENCE: UNITÉS D'ENSEIGNEMENT ET SESSIONS ---
+# -------------------------------------------------------------------
+
+class UniteEnseignement(Base):
+    __tablename__ = 'unites_enseignement'
+    __table_args__ = {'extend_existing': True}
+    
+    id_ue = Column(String(50), primary_key=True)
+    code_ue = Column(String(20), unique=True, nullable=False)
+    intitule = Column(String(255), nullable=False)
+    credit_ue = Column(Integer, nullable=False)
+    
+    code_semestre = Column(String(10), ForeignKey('semestres.code_semestre'), nullable=False)
+    semestre = relationship("Semestre", back_populates="unites_enseignement") 
+    
+    elements_constitutifs = relationship("ElementConstitutif", back_populates="unite_enseignement")
+
+
+class ElementConstitutif(Base):
+    __tablename__ = 'elements_constitutifs'
+    __table_args__ = {'extend_existing': True}
+    
+    id_ec = Column(String(50), primary_key=True)
+    code_ec = Column(String(20), unique=True, nullable=False)
+    intitule = Column(String(255), nullable=False)
+    coefficient = Column(Integer, default=1, nullable=False)
+    
+    id_ue = Column(String(50), ForeignKey('unites_enseignement.id_ue'), nullable=False)
+    
+    unite_enseignement = relationship("UniteEnseignement", back_populates="elements_constitutifs")
+    
+    notes = relationship("Note", back_populates="element_constitutif")
+
+
+class SessionExamen(Base):
+    """ Table conservée pour les sessions d'examen (ex: Normale, Rattrapage) """
+    __tablename__ = 'sessions_examen'
+    __table_args__ = {'extend_existing': True}
+    
+    code_session = Column(String(5), primary_key=True) # Ex: N, R
+    label = Column(String(50), nullable=False, unique=True) # Ex: Normale, Rattrapage
+    
+    notes = relationship("Note", back_populates="session")
+
+
+# -------------------------------------------------------------------
+# --- TABLES DE RÉFÉRENCE: TYPE D'INSCRIPTION ---
+# -------------------------------------------------------------------
+
+class TypeInscription(Base):
+    __tablename__ = 'types_inscription'
+    __table_args__ = {'extend_existing': True}
+    
+    code = Column(String(10), primary_key=True) # Ex: 'CLAS', 'HYB'
+    label = Column(String(50), nullable=False, unique=True)
+    description = Column(Text, nullable=True) 
+    
+    inscriptions = relationship("Inscription", back_populates="type_inscription")
+
+# ===================================================================
+# --- TABLES DE DONNÉES: ÉTUDIANT, INSCRIPTION, RÉSULTATS ---
+# ===================================================================
 
 class AnneeUniversitaire(Base):
     __tablename__ = 'annees_universitaires'
@@ -108,68 +199,172 @@ class AnneeUniversitaire(Base):
     annee = Column(String(9), primary_key=True)
     description = Column(Text, nullable=True) 
     
-    inscriptions = relationship("Inscription", backref="annee_univ")
+    # 🚨 CORRECTION: Utilisation de back_populates
+    inscriptions = relationship("Inscription", back_populates="annee_univ")
+    notes_obtenues = relationship("Note", back_populates="annee_univ")
 
-
-# -------------------------------------------------------------------
-# --- TABLES DE DONNÉES ÉTUDIANT ET INSCRIPTION (INCHANGÉES) ---
-# -------------------------------------------------------------------
 
 class Etudiant(Base):
     __tablename__ = 'etudiants'
+    __table_args__ = (
+        # ❌ CETTE LIGNE EST SUPPRIMÉE : 
+        # CheckConstraint("sexe IN ('M', 'F', 'Autre')", name='check_sexe_mf_autre'),
+        
+        # ⚠️ NOTE: Si vous aviez d'autres arguments dans __table_args__ (comme UniqueConstraint, etc.), 
+        # ils doivent être conservés. Si seule la contrainte de sexe était présente, 
+        # vous pouvez utiliser un tuple vide ou supprimer complètement __table_args__.
+        {'extend_existing': True} 
+    )
     
-    # Clé Primaire
     code_etudiant = Column(String(50), primary_key=True) 
 
-    # Informations de base
-    numero_inscription = Column(String(50)) 
-    nom = Column(String(100))
+    # 🚨 CORRECTION: Contrainte UNIQUE retirée
+    numero_inscription = Column(String(50))
+    
+    nom = Column(String(100), nullable=False)
     prenoms = Column(String(150))
-    sexe = Column(String(20)) 
+    sexe = Column(String(20)) # Laissez le type String(20)
 
-    # État Civil
     naissance_date = Column(Date, nullable=True)
     naissance_lieu = Column(String(100))
     nationalite = Column(String(50))
     
-    # Baccalauréat 
     bacc_annee = Column(Integer, nullable=True)
     bacc_serie = Column(String(50)) 
     bacc_centre = Column(String(100))
     
-    # Contact
     adresse = Column(String(255))
     telephone = Column(String(50))
     mail = Column(String(100))
     
-    # CIN 
     cin = Column(String(100))
     cin_date = Column(Date, nullable=True)
     cin_lieu = Column(String(100))
 
-    inscriptions = relationship("Inscription", backref="etudiant")
+    # Relations 
+    inscriptions = relationship("Inscription", back_populates="etudiant")
+    notes_obtenues = relationship("Note", back_populates="etudiant")
+    credits_cycles = relationship("SuiviCreditCycle", back_populates="etudiant")
 
 
 class Inscription(Base):
     __tablename__ = 'inscriptions'
-    
-    code_inscription = Column(String(50), primary_key=True)
-    
-    # Clés étrangères
-    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'))
-    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'))
-    id_parcours = Column(String(50), ForeignKey('parcours.id_parcours'))
-    
-    niveau = Column(String(20))
-    formation = Column(String(20), nullable=True)
-    
-    # Contrainte d'unicité pour les inscriptions
     __table_args__ = (
         UniqueConstraint(
             'code_etudiant', 
             'annee_universitaire', 
             'id_parcours', 
-            'niveau',  
-            name='uq_etudiant_annee_parcours_niveau' 
+            'code_semestre', 
+            name='uq_etudiant_annee_parcours_semestre' 
         ),
+        {'extend_existing': True} 
     )
+    
+    code_inscription = Column(String(50), primary_key=True)
+    
+    # Clés étrangères
+    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    id_parcours = Column(String(50), ForeignKey('parcours.id_parcours'), nullable=False)
+    code_semestre = Column(String(10), ForeignKey('semestres.code_semestre'), nullable=False)
+    code_type_inscription = Column(String(10), ForeignKey('types_inscription.code'), nullable=False)
+    
+    # CREDIT et VALIDATION du SEMESTRE
+    credit_acquis_semestre = Column(Integer, default=0) 
+    is_semestre_valide = Column(Boolean, default=False) 
+    
+    # 🚨 CORRECTION: Utilisation de back_populates (les backrefs sur Inscription ont été supprimés)
+    etudiant = relationship("Etudiant", back_populates="inscriptions")
+    annee_univ = relationship("AnneeUniversitaire", back_populates="inscriptions") 
+    parcours = relationship("Parcours", backref="inscriptions") # Reste backref si non défini ailleurs
+    semestre = relationship("Semestre", back_populates="inscriptions")
+    type_inscription = relationship("TypeInscription", back_populates="inscriptions")
+
+
+class ResultatSemestre(Base):
+    """
+    Table stockant le statut final de validation d'un semestre pour un étudiant, 
+    résultant de l'application des règles de compensation et de capitalisation.
+    """
+    __tablename__ = 'resultats_semestre'
+    __table_args__ = (
+        # Clé composite pour garantir l'unicité du résultat par étudiant, semestre et année.
+        UniqueConstraint('code_etudiant', 'code_semestre', 'annee_universitaire', name='uq_resultat_semestre'),
+    )
+    
+    id_resultat = Column(Integer, primary_key=True, autoincrement=True)
+    
+    # Clés Étrangères
+    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
+    code_semestre = Column(String(50), ForeignKey('semestres.code_semestre'), nullable=False)
+    annee_universitaire = Column(String(10), ForeignKey('annees_universitaires.annee'), nullable=False)
+    
+    # 🚨 Champ 1 : L'indicateur de validation finale 🚨
+    # 'V' (Validé), 'NV' (Non Validé) ou 'AJ' (Ajourné)
+    statut_validation = Column(String(5), 
+                               CheckConstraint("statut_validation IN ('V', 'NV', 'AJ')", name='check_statut_validation'), 
+                               nullable=False)
+    
+    # 🚨 Champ 2 : Crédits Réellement Acquis pour ce semestre 🚨
+    # Cela permet de savoir si la validation est due à l'obtention des 30 crédits ou à la compensation.
+    credits_acquis = Column(Numeric(4, 1)) # Par exemple, 25.5 crédits sur 30
+    
+    # 🚨 Champ 3 : Moyenne obtenue (conservé et crucial) 🚨
+    moyenne_obtenue = Column(Numeric(4, 2)) # Ex: 9.85/20
+    
+    # Relations (pour les requêtes SQLAlchemy)
+    etudiant = relationship("Etudiant", backref="resultats_semestre")
+    semestre = relationship("Semestre")
+
+    def __repr__(self):
+        return (f"<ResultatSemestre {self.code_etudiant} - {self.code_semestre} "
+                f"(Moy: {self.moyenne_obtenue}, Crédits: {self.credits_acquis}): {self.statut_validation}>")    
+
+class Note(Base):
+    __tablename__ = 'notes'
+    __table_args__ = (
+        UniqueConstraint(
+            'code_etudiant', 
+            'id_ec', 
+            'annee_universitaire',
+            'code_session',
+            name='uq_etudiant_ec_annee_session' 
+        ),
+        {'extend_existing': True}
+    )
+    
+    id_note = Column(Integer, primary_key=True, autoincrement=True)
+    
+    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
+    id_ec = Column(String(50), ForeignKey('elements_constitutifs.id_ec'), nullable=False)
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    code_session = Column(String(5), ForeignKey('sessions_examen.code_session'), nullable=False)
+    
+    valeur_note = Column(Integer, nullable=False) 
+    is_valide = Column(Boolean, default=False) 
+    
+    # 🚨 CORRECTION: Utilisation de back_populates
+    etudiant = relationship("Etudiant", back_populates="notes_obtenues")
+    element_constitutif = relationship("ElementConstitutif", back_populates="notes")
+    session = relationship("SessionExamen", back_populates="notes")
+    annee_univ = relationship("AnneeUniversitaire", back_populates="notes_obtenues")
+
+
+class SuiviCreditCycle(Base):
+    __tablename__ = 'suivi_credits_cycles'
+    __table_args__ = (
+        UniqueConstraint('code_etudiant', 'cycle_code', name='uq_etudiant_cycle_credit'),
+        {'extend_existing': True}
+    )
+    
+    id_suivi = Column(Integer, primary_key=True, autoincrement=True)
+    
+    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
+    cycle_code = Column(String(10), ForeignKey('cycles.code'), nullable=False)
+    
+    credit_total_acquis = Column(Integer, default=0, nullable=False)
+    is_cycle_valide = Column(Boolean, default=False) 
+    
+    # 🚨 CORRECTION: back_populates déjà corrigé sur la classe Etudiant
+    etudiant = relationship("Etudiant", back_populates="credits_cycles") 
+    cycle = relationship("Cycle", back_populates="suivi_credits")

@@ -17,10 +17,9 @@ if __name__ == "__main__":
     # 1. Initialisation de la BDD et des tables
     database_setup.init_db()
     
-    # 2. Importation des données de métadonnées
-    import_data.import_metadata_to_db()
-    
-    # 3. Importation des données d'inscription
-    import_data.import_inscriptions_to_db()
+    # 2. Appel de l'orchestrateur global d'importation
+    # Ceci remplace les appels individuels : import_fixed_references(), 
+    # import_metadata_to_db(), et import_inscriptions_to_db().
+    import_data.import_all_data()
     
     print("\nProcessus d'initialisation et d'importation terminé.")
