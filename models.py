@@ -38,6 +38,9 @@ class Composante(Base):
     
     mentions = relationship("Mention", backref="composante")
 
+    # 🚨 CORRECTION DANS COMPOSANTE: Utiliser back_populates
+    enseignants_permanents = relationship("Enseignant", back_populates="composante_attachement")
+
 
 class Domaine(Base):
     __tablename__ = 'domaines'
@@ -162,6 +165,10 @@ class ElementConstitutif(Base):
     
     notes = relationship("Note", back_populates="element_constitutif")
 
+    # 🚨 CORRECTION DANS ElementConstitutif: Utiliser back_populates
+    volumes_horaires = relationship("VolumeHoraireEC", back_populates="element_constitutif")
+    affectations = relationship("AffectationEC", back_populates="element_constitutif") # Reste backref ici (vérifiez si cela cause un conflit avec AffectationEC)
+
 
 class SessionExamen(Base):
     """ Table conservée pour les sessions d'examen (ex: Normale, Rattrapage) """
@@ -202,6 +209,9 @@ class AnneeUniversitaire(Base):
     # 🚨 CORRECTION: Utilisation de back_populates
     inscriptions = relationship("Inscription", back_populates="annee_univ")
     notes_obtenues = relationship("Note", back_populates="annee_univ")
+    
+    # 🚨 MISE À JOUR: Lien vers les affectations d'EC
+    affectations_ec = relationship("AffectationEC", back_populates="annee_univ_affectation")
 
 
 class Etudiant(Base):
@@ -313,9 +323,11 @@ class ResultatSemestre(Base):
     
     # Relations
     etudiant = relationship("Etudiant", backref="resultats_semestre")
-    semestre = relationship("Semestre")
-    # 🚨 RELATION VERS LA SESSION 🚨
+    semestre = relationship("Semestre") # Si pas besoin de back_populates dans Semestre
     session = relationship("SessionExamen", backref="resultats_semestre") 
+    # AnneeUniversitaire est défini par backref si on n'ajoute pas de back_populates dans AnneeUniversitaire
+    # On ajoute le backref ici pour clarté
+    annee_univ = relationship("AnneeUniversitaire") # Utilise le backref dans AnneeUniversitaire si défini
 
     def __repr__(self):
         return (f"<ResultatSemestre {self.code_etudiant} - {self.code_semestre} "
@@ -369,3 +381,118 @@ class SuiviCreditCycle(Base):
     # 🚨 CORRECTION: back_populates déjà corrigé sur la classe Etudiant
     etudiant = relationship("Etudiant", back_populates="credits_cycles") 
     cycle = relationship("Cycle", back_populates="suivi_credits")
+
+    # ===================================================================
+# --- TABLES DE DONNÉES: ENSEIGNANT ET CHARGE D'ENSEIGNEMENT ---
+# ===================================================================
+
+class Enseignant(Base):
+    __tablename__ = 'enseignants'
+    __table_args__ = (
+        # Assure l'unicité de CIN si non nul
+        UniqueConstraint('cin', name='uq_enseignant_cin', deferrable=True),
+        {'extend_existing': True}
+    )
+    
+    id_enseignant = Column(String(50), primary_key=True) 
+    matricule = Column(String(50), unique=True, nullable=True) # Matricule si permanent
+
+    nom = Column(String(100), nullable=False)
+    prenoms = Column(String(150))
+    sexe = Column(String(20)) 
+    date_naissance = Column(Date, nullable=True)
+    
+    # Renseignement administratifs/carrière
+    grade = Column(String(50))
+    # 🚨 CORRECTION CRUCIALE : Tout sur une seule ligne si possible ou structure stricte
+    statut = Column(String(10), 
+                    CheckConstraint("statut IN ('PERM', 'VAC')", name='check_statut_enseignant'), # Argument positionnel (la contrainte)
+                    nullable=False) # Argument mot-clé, doit venir APRÈS la contrainte si elle n'est pas nommée
+
+    # Affectation composante (Obligatoire pour un permanent)
+    code_composante_affectation = Column(String(10), 
+                                         ForeignKey('composantes.code'), 
+                                         nullable=True)
+    
+    # Coordonnées / Identité
+    cin = Column(String(100))
+    cin_date = Column(Date, nullable=True)
+    cin_lieu = Column(String(100))
+    telephone = Column(String(50))
+    mail = Column(String(100))
+    rib = Column(String(100)) # Relevé d'Identité Bancaire
+
+    # 🚨 CORRECTION DANS ENSEIGNANT: Renommer la relation côté enfant
+    composante_attachement = relationship("Composante", back_populates="enseignants_permanents")
+    charges_enseignement = relationship("AffectationEC", back_populates="enseignant")
+
+
+class TypeEnseignement(Base):
+    """ Types de charge: Cours, TD, TP """
+    __tablename__ = 'types_enseignement'
+    __table_args__ = {'extend_existing': True}
+    
+    code = Column(String(10), primary_key=True) # Ex: C, TD, TP
+    label = Column(String(50), unique=True, nullable=False)
+    
+    volumes_horaires = relationship("VolumeHoraireEC", back_populates="type_enseignement")
+    affectations = relationship("AffectationEC", back_populates="type_enseignement")
+
+
+class VolumeHoraireEC(Base):
+    """
+    Volume horaire théorique pour un EC, réparti par type et PAR ANNÉE.
+    Ceci permet la gestion d'historique.
+    """
+    __tablename__ = 'volume_horaire_ec'
+    __table_args__ = (
+        # Clé composée pour l'historique
+        UniqueConstraint('id_ec', 'code_type_enseignement', 'annee_universitaire', name='uq_ec_vh_type_annee'),
+        {'extend_existing': True}
+    )
+    
+    id_volume_horaire = Column(Integer, primary_key=True, autoincrement=True)
+    
+    id_ec = Column(String(50), ForeignKey('elements_constitutifs.id_ec'), nullable=False)
+    code_type_enseignement = Column(String(10), ForeignKey('types_enseignement.code'), nullable=False)
+    # 🚨 AJOUT POUR L'HISTORIQUE 🚨
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    
+    volume_heure = Column(Numeric(5, 2), nullable=False) 
+
+    # 🚨 CORRECTION DANS VolumeHoraireEC: Définir la relation et le back_populates
+    element_constitutif = relationship("ElementConstitutif", back_populates="volumes_horaires")
+    type_enseignement = relationship("TypeEnseignement", back_populates="volumes_horaires")
+    annee_univ = relationship("AnneeUniversitaire", backref="volumes_horaires_ec")
+
+
+class AffectationEC(Base):
+    """
+    Associe un enseignant à un EC pour un type d'enseignement et une année universitaire donnés.
+    C'est la table qui gère la charge réelle.
+    """
+    __tablename__ = 'affectations_ec'
+    __table_args__ = (
+        # Un EC, pour un type d'enseignement et une année donnée, 
+        # ne doit être assuré que par un seul enseignant (pour simplifier la gestion de la responsabilité)
+        UniqueConstraint('id_ec', 'code_type_enseignement', 'annee_universitaire', name='uq_affectation_unique'), 
+        {'extend_existing': True}
+    )
+    
+    id_affectation = Column(Integer, primary_key=True, autoincrement=True)
+    
+    id_enseignant = Column(String(50), ForeignKey('enseignants.id_enseignant'), nullable=False)
+    id_ec = Column(String(50), ForeignKey('elements_constitutifs.id_ec'), nullable=False)
+    code_type_enseignement = Column(String(10), ForeignKey('types_enseignement.code'), nullable=False)
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    
+    # Le volume horaire peut être repris du VolumeHoraireEC ou spécifié ici si ajustement (optionnel)
+    volume_heure_effectif = Column(Numeric(5, 2), nullable=True) 
+
+    # Relations
+    enseignant = relationship("Enseignant", back_populates="charges_enseignement")
+    element_constitutif = relationship("ElementConstitutif", back_populates="affectations")
+    type_enseignement = relationship("TypeEnseignement", back_populates="affectations")
+    annee_univ_affectation = relationship("AnneeUniversitaire", back_populates="affectations_ec")
+
+    
