@@ -14,7 +14,8 @@ from models import (
     Institution, Composante, Domaine, Mention, Parcours, 
     AnneeUniversitaire, Etudiant, Inscription,
     # CLASSES LMD & MODE INSCRIPTION
-    Cycle, Niveau, Semestre, ModeInscription, SessionExamen # ✅ ModeInscription
+    Cycle, Niveau, Semestre, ModeInscription, SessionExamen, # ✅ ModeInscription
+    TypeFormation # 👈 AJOUT de TypeFormation
 )
 
 # Configuration du logging (inchangée)
@@ -40,7 +41,7 @@ def safe_string(s):
 
 def import_fixed_references(session: Session):
     """
-    Insère les données de référence fixes (Cycles, Niveaux, Semestres, Types Inscription, Sessions).
+    Insère les données de référence fixes (Cycles, Niveaux, Semestres, Types Inscription, Sessions, Types Formation).
     """
     print("\n--- 1. Importation des Données de Référence Fixes (LMD & Types) ---")
     
@@ -82,24 +83,32 @@ def import_fixed_references(session: Session):
             all_semestre_codes.append(sem_code_complet) 
 
     # 3. Modes Inscription (Anciennement Types Inscription)
-    modes_inscription_data = [ # ✅ Nouveau nom de variable
+    modes_inscription_data = [
         {'code': 'CLAS', 'label': 'Classique'},
         {'code': 'HYB', 'label': 'Hybride'},
     ]
     for data in modes_inscription_data:
-        session.merge(ModeInscription(**data)) # ✅ ModeInscription
+        session.merge(ModeInscription(**data))
         
-    # 4. Insertion des Sessions d'Examen (SessionExamen) 🚨
+    # 4. Insertion des Sessions d'Examen (SessionExamen)
     session_examen_data = [
         {'code_session': 'N', 'label': 'Normale'},
         {'code_session': 'R', 'label': 'Rattrapage'},
     ]
-                          
     for sess in session_examen_data:
         session.merge(SessionExamen(**sess))
+
+    # 5. Insertion des Types de Formation (TypeFormation) 👈 NOUVELLE ÉTAPE
+    types_formation_data = [
+        {'code': 'FI', 'label': 'Formation Initiale', 'description': 'Formation classique à temps plein.'},
+        {'code': 'FC', 'label': 'Formation Continue', 'description': 'Formation destinée aux professionnels en activité.'},
+        {'code': 'FOAD', 'label': 'Formation à Distance', 'description': 'Formation ouverte à distance.'},
+    ]
+    for data in types_formation_data:
+        session.merge(TypeFormation(**data))
         
     session.commit()
-    print("✅ Données de Référence LMD, Types Inscription et Sessions d'Examen insérées.")
+    print("✅ Données de Référence LMD, Types Inscription, Sessions d'Examen et Types Formation insérées.")
 
 
 # ----------------------------------------------------------------------

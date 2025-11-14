@@ -204,6 +204,22 @@ class ModeInscription(Base): # 👈 CHANGEMENT DE NOM DE CLASSE
     inscriptions = relationship("Inscription", back_populates="mode_inscription") # 👈 CHANGEMENT DE NOM DE RELATION
 
 # ===================================================================
+# --- TABLES DE RÉFÉRENCE: TYPE DE FORMATION ---
+# ===================================================================
+
+class TypeFormation(Base):
+    __tablename__ = 'types_formation'
+    __table_args__ = {'extend_existing': True}
+    
+    code = Column(String(10), primary_key=True) # Ex: FI, FC, FOAD
+    label = Column(String(50), nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    
+    # 🚨 Nouvelle relation : Pour lier aux inscriptions
+    inscriptions = relationship("Inscription", back_populates="type_formation")
+    
+
+# ===================================================================
 # --- TABLES DE DONNÉES: ÉTUDIANT, INSCRIPTION, RÉSULTATS ---
 # ===================================================================
 
@@ -292,6 +308,8 @@ class Inscription(Base):
     code_semestre = Column(String(10), ForeignKey('semestres.code_semestre'), nullable=False)
     # Mise à jour de la clé étrangère
     code_mode_inscription = Column(String(10), ForeignKey('modes_inscription.code'), nullable=False) # 👈 CHANGEMENT DE TABLE RÉFÉRENCÉE et NOM DE COLONNE
+    # 🚨 NOUVELLE CLÉ ÉTRANGÈRE : code_type_formation
+    code_type_formation = Column(String(10), ForeignKey('types_formation.code'), nullable=False, default='FI')
     
     # CREDIT et VALIDATION du SEMESTRE
     credit_acquis_semestre = Column(Integer, default=0) 
@@ -303,7 +321,8 @@ class Inscription(Base):
     parcours = relationship("Parcours", backref="inscriptions")
     semestre = relationship("Semestre", back_populates="inscriptions")
     # Mise à jour de la relation
-    mode_inscription = relationship("ModeInscription", back_populates="inscriptions") # 👈 CHANGEMENT DE NOM DE CLASSE ET DE RELATION
+    mode_inscription = relationship("ModeInscription", back_populates="inscriptions") 
+    type_formation = relationship("TypeFormation", back_populates="inscriptions")# 👈 CHANGEMENT DE NOM DE CLASSE ET DE RELATION
 
 
 class ResultatSemestre(Base):
