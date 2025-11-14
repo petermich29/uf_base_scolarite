@@ -148,6 +148,7 @@ class UniteEnseignement(Base):
     semestre = relationship("Semestre", back_populates="unites_enseignement") 
     
     elements_constitutifs = relationship("ElementConstitutif", back_populates="unite_enseignement")
+    resultats = relationship("ResultatUE", back_populates="unite_enseignement")
 
 
 class ElementConstitutif(Base):
@@ -169,7 +170,9 @@ class ElementConstitutif(Base):
     volumes_horaires = relationship("VolumeHoraireEC", back_populates="element_constitutif")
     affectations = relationship("AffectationEC", back_populates="element_constitutif") # Reste backref ici (vérifiez si cela cause un conflit avec AffectationEC)
 
-
+# ===================================================================
+# --- TABLES DE RÉFÉRENCE: UNITÉS D'ENSEIGNEMENT ET SESSIONS ---
+# ===================================================================
 class SessionExamen(Base):
     """ Table conservée pour les sessions d'examen (ex: Normale, Rattrapage) """
     __tablename__ = 'sessions_examen'
@@ -178,22 +181,27 @@ class SessionExamen(Base):
     code_session = Column(String(5), primary_key=True) # Ex: N, R
     label = Column(String(50), nullable=False, unique=True) # Ex: Normale, Rattrapage
     
-    notes = relationship("Note", back_populates="session")
+    # Collection de toutes les Notes obtenues pour cette session
+    notes_session = relationship("Note", back_populates="session")
+    
+    # 🚨 CORRECTION FINALE : Collection de tous les ResultatUE obtenus pour cette session
+    resultats_ue_session = relationship("ResultatUE", back_populates="session")
 
 
 # -------------------------------------------------------------------
 # --- TABLES DE RÉFÉRENCE: TYPE D'INSCRIPTION ---
 # -------------------------------------------------------------------
 
-class TypeInscription(Base):
-    __tablename__ = 'types_inscription'
+class ModeInscription(Base): # 👈 CHANGEMENT DE NOM DE CLASSE
+    __tablename__ = 'modes_inscription' # 👈 CHANGEMENT DE NOM DE TABLE
     __table_args__ = {'extend_existing': True}
     
     code = Column(String(10), primary_key=True) # Ex: 'CLAS', 'HYB'
     label = Column(String(50), nullable=False, unique=True)
     description = Column(Text, nullable=True) 
     
-    inscriptions = relationship("Inscription", back_populates="type_inscription")
+    # Mise à jour de la relation
+    inscriptions = relationship("Inscription", back_populates="mode_inscription") # 👈 CHANGEMENT DE NOM DE RELATION
 
 # ===================================================================
 # --- TABLES DE DONNÉES: ÉTUDIANT, INSCRIPTION, RÉSULTATS ---
@@ -206,11 +214,11 @@ class AnneeUniversitaire(Base):
     annee = Column(String(9), primary_key=True)
     description = Column(Text, nullable=True) 
     
-    # 🚨 CORRECTION: Utilisation de back_populates
+    # Correction des back_populates
     inscriptions = relationship("Inscription", back_populates="annee_univ")
     notes_obtenues = relationship("Note", back_populates="annee_univ")
-    
-    # 🚨 MISE À JOUR: Lien vers les affectations d'EC
+    resultats_ue = relationship("ResultatUE", back_populates="annee_univ") # 👈 AJOUT
+    volumes_horaires_ec = relationship("VolumeHoraireEC", back_populates="annee_univ") # 👈 AJOUT
     affectations_ec = relationship("AffectationEC", back_populates="annee_univ_affectation")
 
 
@@ -253,8 +261,13 @@ class Etudiant(Base):
 
     # Relations 
     inscriptions = relationship("Inscription", back_populates="etudiant")
-    notes_obtenues = relationship("Note", back_populates="etudiant")
+    # 🚨 MISE À JOUR: Utilisation de 'notes_obtenues' pour harmoniser avec la classe Note
+    notes_obtenues = relationship("Note", back_populates="etudiant") 
     credits_cycles = relationship("SuiviCreditCycle", back_populates="etudiant")
+    
+    # 🚨 AJOUT DE LA RELATION
+    resultats_ue = relationship("ResultatUE", back_populates="etudiant") 
+    resultats_semestre = relationship("ResultatSemestre", back_populates="etudiant_resultat") # Gardé backref ici pour simplicité
 
 
 class Inscription(Base):
@@ -277,18 +290,20 @@ class Inscription(Base):
     annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
     id_parcours = Column(String(50), ForeignKey('parcours.id_parcours'), nullable=False)
     code_semestre = Column(String(10), ForeignKey('semestres.code_semestre'), nullable=False)
-    code_type_inscription = Column(String(10), ForeignKey('types_inscription.code'), nullable=False)
+    # Mise à jour de la clé étrangère
+    code_mode_inscription = Column(String(10), ForeignKey('modes_inscription.code'), nullable=False) # 👈 CHANGEMENT DE TABLE RÉFÉRENCÉE et NOM DE COLONNE
     
     # CREDIT et VALIDATION du SEMESTRE
     credit_acquis_semestre = Column(Integer, default=0) 
     is_semestre_valide = Column(Boolean, default=False) 
     
-    # 🚨 CORRECTION: Utilisation de back_populates (les backrefs sur Inscription ont été supprimés)
+    # Relations
     etudiant = relationship("Etudiant", back_populates="inscriptions")
     annee_univ = relationship("AnneeUniversitaire", back_populates="inscriptions") 
-    parcours = relationship("Parcours", backref="inscriptions") # Reste backref si non défini ailleurs
+    parcours = relationship("Parcours", backref="inscriptions")
     semestre = relationship("Semestre", back_populates="inscriptions")
-    type_inscription = relationship("TypeInscription", back_populates="inscriptions")
+    # Mise à jour de la relation
+    mode_inscription = relationship("ModeInscription", back_populates="inscriptions") # 👈 CHANGEMENT DE NOM DE CLASSE ET DE RELATION
 
 
 class ResultatSemestre(Base):
@@ -322,16 +337,51 @@ class ResultatSemestre(Base):
     moyenne_obtenue = Column(Numeric(4, 2)) # Ex: 9.85/20
     
     # Relations
-    etudiant = relationship("Etudiant", backref="resultats_semestre")
-    semestre = relationship("Semestre") # Si pas besoin de back_populates dans Semestre
+    etudiant_resultat = relationship("Etudiant", back_populates="resultats_semestre")
+    semestre = relationship("Semestre")
     session = relationship("SessionExamen", backref="resultats_semestre") 
-    # AnneeUniversitaire est défini par backref si on n'ajoute pas de back_populates dans AnneeUniversitaire
-    # On ajoute le backref ici pour clarté
     annee_univ = relationship("AnneeUniversitaire") # Utilise le backref dans AnneeUniversitaire si défini
 
     def __repr__(self):
         return (f"<ResultatSemestre {self.code_etudiant} - {self.code_semestre} "
                 f"(Sess: {self.code_session}, Moy: {self.moyenne_obtenue}): {self.statut_validation}>")   
+    
+class ResultatUE(Base):
+    """
+    Table stockant la moyenne et le statut de validation d'une UE
+    pour un étudiant, en utilisant les meilleures notes des EC entre sessions.
+    """
+    __tablename__ = 'resultats_ue'
+    __table_args__ = (
+        # Un seul résultat final par UE, étudiant, année et session
+        UniqueConstraint('code_etudiant', 'id_ue', 'annee_universitaire', 'code_session', name='uq_resultat_ue_unique'),
+    )
+    
+    id_resultat_ue = Column(Integer, primary_key=True, autoincrement=True)
+    
+    # Clés Étrangères
+    code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
+    id_ue = Column(String(50), ForeignKey('unites_enseignement.id_ue'), nullable=False)
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    code_session = Column(String(5), ForeignKey('sessions_examen.code_session'), nullable=False) 
+    
+    # RÉSULTAT CALCULÉ
+    moyenne_ue = Column(Numeric(4, 2), nullable=False) # Moyenne calculée des EC capitalisés (ex: 10.00)
+    is_ue_acquise = Column(Boolean, default=False, nullable=False) # TRUE si moyenne_ue >= 10
+    credit_obtenu = Column(Integer, default=0, nullable=False) # Crédit total de l'UE (0 ou credit_ue)
+
+    # Relations
+    etudiant = relationship("Etudiant", back_populates="resultats_ue") 
+    unite_enseignement = relationship("UniteEnseignement", back_populates="resultats")
+    
+    # 🚨 VÉRIFICATION OK : Ce back_populates pointe vers le nouvel attribut dans SessionExamen
+    session = relationship("SessionExamen", back_populates="resultats_ue_session") 
+    
+    annee_univ = relationship("AnneeUniversitaire", back_populates="resultats_ue")
+    
+    def __repr__(self):
+        return (f"<ResultatUE {self.code_etudiant} - {self.id_ue} "
+                f"(Sess: {self.code_session}, Moy: {self.moyenne_ue}): {self.is_ue_acquise}>")
 
 class Note(Base):
     __tablename__ = 'notes'
@@ -348,19 +398,27 @@ class Note(Base):
     
     id_note = Column(Integer, primary_key=True, autoincrement=True)
     
+    # Clés Étrangères Composites
     code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
     id_ec = Column(String(50), ForeignKey('elements_constitutifs.id_ec'), nullable=False)
     annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
     code_session = Column(String(5), ForeignKey('sessions_examen.code_session'), nullable=False)
     
-    valeur_note = Column(Integer, nullable=False) 
-    is_valide = Column(Boolean, default=False) 
-    
-    # 🚨 CORRECTION: Utilisation de back_populates
-    etudiant = relationship("Etudiant", back_populates="notes_obtenues")
+    # Donnée Principale
+    valeur_note = Column(Numeric(5, 2), nullable=False) # Note obtenue (permet les décimales)
+
+    # Relations
+    # 🚨 MISE À JOUR : Changement de backref pour correspondre au nom dans Etudiant
+    etudiant = relationship("Etudiant", back_populates="notes_obtenues") 
     element_constitutif = relationship("ElementConstitutif", back_populates="notes")
-    session = relationship("SessionExamen", back_populates="notes")
+    # 🚨 MISE À JOUR : Changement de backref à back_populates
     annee_univ = relationship("AnneeUniversitaire", back_populates="notes_obtenues")
+    # 🚨 MISE À JOUR : Changement de backref à back_populates
+    session = relationship("SessionExamen", back_populates="notes_session")
+
+    def __repr__(self):
+        return (f"<Note {self.code_etudiant} - {self.id_ec} "
+                f"({self.annee_universitaire}, {self.code_session}): {self.valeur_note}>")
 
 
 class SuiviCreditCycle(Base):
@@ -460,10 +518,11 @@ class VolumeHoraireEC(Base):
     
     volume_heure = Column(Numeric(5, 2), nullable=False) 
 
-    # 🚨 CORRECTION DANS VolumeHoraireEC: Définir la relation et le back_populates
+    # Relations
     element_constitutif = relationship("ElementConstitutif", back_populates="volumes_horaires")
     type_enseignement = relationship("TypeEnseignement", back_populates="volumes_horaires")
-    annee_univ = relationship("AnneeUniversitaire", backref="volumes_horaires_ec")
+    # 🚨 MISE À JOUR : Changement de backref à back_populates
+    annee_univ = relationship("AnneeUniversitaire", back_populates="volumes_horaires_ec")
 
 
 class AffectationEC(Base):

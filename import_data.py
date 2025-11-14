@@ -13,8 +13,8 @@ import database_setup
 from models import (
     Institution, Composante, Domaine, Mention, Parcours, 
     AnneeUniversitaire, Etudiant, Inscription,
-    # CLASSES LMD & TYPE INSCRIPTION
-    Cycle, Niveau, Semestre, TypeInscription, SessionExamen
+    # CLASSES LMD & MODE INSCRIPTION
+    Cycle, Niveau, Semestre, ModeInscription, SessionExamen # ✅ ModeInscription
 )
 
 # Configuration du logging (inchangée)
@@ -81,13 +81,13 @@ def import_fixed_references(session: Session):
             ))
             all_semestre_codes.append(sem_code_complet) 
 
-    # 3. Types Inscription
-    types_inscription_data = [
+    # 3. Modes Inscription (Anciennement Types Inscription)
+    modes_inscription_data = [ # ✅ Nouveau nom de variable
         {'code': 'CLAS', 'label': 'Classique'},
         {'code': 'HYB', 'label': 'Hybride'},
     ]
-    for data in types_inscription_data:
-        session.merge(TypeInscription(**data))
+    for data in modes_inscription_data:
+        session.merge(ModeInscription(**data)) # ✅ ModeInscription
         
     # 4. Insertion des Sessions d'Examen (SessionExamen) 🚨
     session_examen_data = [
@@ -336,30 +336,29 @@ def _load_and_clean_inscriptions():
                  print("\n⚠️ ATTENTION: Colonne 'niveau' (ou 'niveau_code') manquante pour enrichir le code_semestre. Risque d'erreurs FK.")
 
         
-        # 2. Renommage et Standardisation du Type Inscription
+        # 2. Renommage et Standardisation du Type Inscription -> Mode Inscription
         if 'type_formation' in df.columns:
             
             # Renommage
-            if 'code_type_inscription' not in df.columns:
-                df.rename(columns={'type_formation': 'code_type_inscription'}, inplace=True)
-                
+            if 'code_mode_inscription' not in df.columns: # ✅ CHANGEMENT ICI
+                # Si type_formation existe, on le renomme en code_mode_inscription
+                df.rename(columns={'type_formation': 'code_mode_inscription'}, inplace=True) # ✅ CHANGEMENT ICI
+            
             # Standardisation des valeurs (CLASSIQUE/HYBRIDE -> CLAS/HYB)
-            # Utilisation de .loc pour éviter le SettingWithCopyWarning et s'assurer que c'est une chaîne
-            df.loc[:, 'code_type_inscription'] = df['code_type_inscription'].astype(str).str.upper().replace({
+            df.loc[:, 'code_mode_inscription'] = df['code_mode_inscription'].astype(str).str.upper().replace({ # ✅ CHANGEMENT ICI
                 'CLASSIQUE': 'CLAS',
                 'HYBRIDE': 'HYB'
             })
         
         # S'assurer que le nettoyage final est appliqué aux codes d'inscription et gérer les valeurs vides/NaN après le replace
-        if 'code_type_inscription' in df.columns:
-            df['code_type_inscription'] = df['code_type_inscription'].astype(str).apply(safe_string)
+        if 'code_mode_inscription' in df.columns: # ✅ CHANGEMENT ICI
+            df['code_mode_inscription'] = df['code_mode_inscription'].astype(str).apply(safe_string) # ✅ CHANGEMENT ICI
 
         # 🚨 AJOUT DE LA GARANTIE DE COLONNE 🚨
-        if 'code_type_inscription' not in df.columns:
-             # Si la colonne n'a jamais existé (ni type_formation, ni code_type_inscription)
-             # On l'ajoute avec la valeur par défaut 'CLAS'
-             df['code_type_inscription'] = 'CLAS'
-             print("ℹ️ Colonne 'code_type_inscription' ajoutée avec la valeur par défaut 'CLAS'.")
+        if 'code_mode_inscription' not in df.columns: # ✅ CHANGEMENT ICI
+            # Si la colonne n'a jamais existé
+            df['code_mode_inscription'] = 'CLAS' # ✅ CHANGEMENT ICI
+            print("ℹ️ Colonne 'code_mode_inscription' ajoutée avec la valeur par défaut 'CLAS'.") # ✅ CHANGEMENT ICI
 
         return df
         
@@ -435,7 +434,7 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
     """Importe les Inscriptions (commit par lot)."""
     print("\n--- Importation des Inscriptions ---")
     
-    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_type_inscription']
+    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_mode_inscription'] # ✅ Changement ici
     df_inscriptions = df.dropna(subset=cles_requises)
     
     errors_fk, errors_uq, errors_data, errors_other = 0, 0, 0, 0
@@ -450,7 +449,7 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
                 annee_universitaire=safe_string(row['annee_universitaire']), 
                 id_parcours=row['id_parcours'], 
                 code_semestre=safe_string(row['code_semestre']), 
-                code_type_inscription=safe_string(row.get('code_type_inscription', 'CLAS')),
+                code_mode_inscription=safe_string(row.get('code_mode_inscription', 'CLAS')), # ✅ CHANGEMENT ICI
                 # credit_acquis_semestre et is_semestre_valide ont des valeurs par défaut
             ))
             
