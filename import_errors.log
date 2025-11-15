@@ -1,136 +1,268 @@
-2025-11-14 11:38:52,858 - ERROR - INSCRIPTION (Intégrité): ETU2022_014421_23-24_SCIENCE_PC_PHY_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+2025-11-14 11:53:33,907 - ERROR - INSCRIPTION (Intégrité): ETU2024_043537_24-25_EGSS-MCI_ECOGE_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 4499
+2025-11-14 11:53:34,262 - ERROR - INSCRIPTION (Intégrité): ETU2024_041199_24-25_EGSS-MCI_ECOGE_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 4999
+2025-11-14 11:53:34,617 - ERROR - INSCRIPTION (Intégrité): ETU2023_039126_24-25_EGSS-MCI_ECOGE_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 5499
+2025-11-14 11:53:35,031 - ERROR - INSCRIPTION (Intégrité): ETU2024_045920_24-25_EGSS-MCI_MCI_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 5999
+2025-11-14 11:53:35,374 - ERROR - INSCRIPTION (Intégrité): ETU2024_045459_24-25_EGSS-MCI_SS_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_MCI_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 6499
+2025-11-14 11:53:35,728 - ERROR - INSCRIPTION (Intégrité): ETU2022_005326_23-24_SCIENCE_PC_CHIMIE_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_SS_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 6999
+2025-11-14 11:53:36,081 - ERROR - INSCRIPTION (Intégrité): ETU2023_033569_23-24_SCIENCE_SV_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S01) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 17999
-2025-11-14 11:38:53,271 - ERROR - INSCRIPTION (Intégrité): ETU2023_040070_23-24_SCIENCE_SV_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 7499
+2025-11-14 11:53:36,435 - ERROR - INSCRIPTION (Intégrité): ETU2023_035696_23-24_EMIT_MGMT_AES_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S01) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 18499
-2025-11-14 11:38:53,700 - ERROR - INSCRIPTION (Intégrité): ETU2023_039225_23-24_EMIT_MGMT_AES_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 7999
+2025-11-14 11:53:41,015 - ERROR - INSCRIPTION (Intégrité): ETU2024_045061_24-25_SCIENCE_SV_TC_S01 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S01) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 18999
-2025-11-14 11:39:15,711 - ERROR - INSCRIPTION (Intégrité): ETU2022_017370_23-24_SCIENCE_PC_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 13999
+2025-11-14 11:53:57,735 - ERROR - INSCRIPTION (Intégrité): ETU2024_041547_24-25_EGSS-MCI_ECOGE_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 35499
+2025-11-14 11:53:58,079 - ERROR - INSCRIPTION (Intégrité): ETU2024_041500_24-25_EGSS-MCI_ECOGE_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 35999
+2025-11-14 11:53:58,435 - ERROR - INSCRIPTION (Intégrité): ETU2023_039261_24-25_EGSS-MCI_ECOGE_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 36499
+2025-11-14 11:53:58,783 - ERROR - INSCRIPTION (Intégrité): ETU2024_046080_24-25_EGSS-MCI_MCI_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 36999
+2025-11-14 11:53:59,136 - ERROR - INSCRIPTION (Intégrité): ETU2024_045760_24-25_EGSS-MCI_SS_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_MCI_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 37499
+2025-11-14 11:53:59,485 - ERROR - INSCRIPTION (Intégrité): ETU2022_006181_23-24_SCIENCE_PC_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_SS_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 37999
+2025-11-14 11:53:59,857 - ERROR - INSCRIPTION (Intégrité): ETU2023_033405_23-24_SCIENCE_SV_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S02) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 45999
-2025-11-14 11:39:16,084 - ERROR - INSCRIPTION (Intégrité): ETU2022_017569_23-24_SCIENCE_SV_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 38499
+2025-11-14 11:54:00,356 - ERROR - INSCRIPTION (Intégrité): ETU2023_034851_23-24_EMIT_MGMT_AES_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S02) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 46499
-2025-11-14 11:39:16,440 - ERROR - INSCRIPTION (Intégrité): ETU2023_039178_23-24_EMIT_MGMT_AES_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 38999
+2025-11-14 11:54:04,916 - ERROR - INSCRIPTION (Intégrité): ETU2024_044733_24-25_SCIENCE_SV_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S02) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 46999
-2025-11-14 11:39:25,136 - ERROR - INSCRIPTION (Intégrité): ETU2022_022674_23-24_DEGSS_ECOGE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2023_030206) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 56499
-2025-11-14 11:39:33,130 - ERROR - INSCRIPTION (Intégrité): ETU2022_004173_22-23_ENS_SE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2023_037869) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 66499
-2025-11-14 11:39:33,921 - ERROR - INSCRIPTION (Intégrité): ETU2022_014592_23-24_SCIENCE_MA_MF_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 44499
+2025-11-14 11:54:05,326 - ERROR - INSCRIPTION (Intégrité): ETU2023_030296_23-24_DEGSS_DROIT_TC_S02 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L1_S03) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 67499
-2025-11-14 11:39:34,290 - ERROR - INSCRIPTION (Intégrité): ETU2022_017120_23-24_SCIENCE_SV_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_semestre)=(L2_S02) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 44999
+2025-11-14 11:54:20,830 - ERROR - INSCRIPTION (Intégrité): ETU2022_021198_24-25_EGSS-MCI_ECOGE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 64499
+2025-11-14 11:54:21,179 - ERROR - INSCRIPTION (Intégrité): ETU2023_038910_24-25_EGSS-MCI_ECOGE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 64999
+2025-11-14 11:54:21,535 - ERROR - INSCRIPTION (Intégrité): ETU2022_018911_24-25_EGSS-MCI_ECOGE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 65499
+2025-11-14 11:54:21,897 - ERROR - INSCRIPTION (Intégrité): ETU2022_005457_23-24_SCIENCE_MA_MISS_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 65999
+2025-11-14 11:54:22,274 - ERROR - INSCRIPTION (Intégrité): ETU2022_005845_23-24_SCIENCE_SV_BT_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L3_S03) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 67999
-2025-11-14 11:39:34,665 - ERROR - INSCRIPTION (Intégrité): ETU2022_015920_23-24_EMIT_INFO_DAII_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 66499
+2025-11-14 11:54:22,632 - ERROR - INSCRIPTION (Intégrité): ETU2022_007634_23-24_EMIT_INFO_DAII_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L1_S03) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 68499
-2025-11-14 11:39:39,403 - ERROR - INSCRIPTION (Intégrité): ETU2022_028066_23-24_DEGSS_DROIT_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L1_S03) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 74499
-2025-11-14 11:39:47,166 - ERROR - INSCRIPTION (Intégrité): ETU2022_014999_23-24_ENS_SE_SE_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_semestre)=(L3_S03) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 66999
+2025-11-14 11:54:25,413 - ERROR - INSCRIPTION (Intégrité): ETU2022_019335_23-24_ENS_SE_SE_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2023_037869) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 84499
-2025-11-14 11:39:48,307 - ERROR - INSCRIPTION (Intégrité): ETU2022_017112_23-24_SCIENCE_SV_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_etudiant)=(ETU2023_036176) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 70499
+2025-11-14 11:54:25,815 - ERROR - INSCRIPTION (Intégrité): ETU2022_020849_23-24_DEGSS_DROIT_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L3_S04) n'est pas présente dans la table « semestres ».
+DETAIL:  La clé (code_semestre)=(l2_S03) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 70999
+2025-11-14 11:54:26,172 - ERROR - INSCRIPTION (Intégrité): ETU2022_027403_23-24_DEGSS_ECOGE_TC_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_etudiant_fkey »
+DETAIL:  La clé (code_etudiant)=(ETU2023_029366) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 71499
+2025-11-14 11:54:32,791 - ERROR - INSCRIPTION (Intégrité): ETU2023_035087_24-25_EMIT_INFO_DAII_S03 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_semestre_fkey »
+DETAIL:  La clé (code_semestre)=(L1_S03) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 79499
+2025-11-14 11:54:37,168 - ERROR - INSCRIPTION (Intégrité): ETU2022_021797_24-25_EGSS-MCI_ECOGE_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 84499
+2025-11-14 11:54:37,591 - ERROR - INSCRIPTION (Intégrité): ETU2023_039085_24-25_EGSS-MCI_ECOGE_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 84999
+2025-11-14 11:54:37,941 - ERROR - INSCRIPTION (Intégrité): ETU2023_039338_24-25_EGSS-MCI_ECOGE_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 85499
+2025-11-14 11:54:38,297 - ERROR - INSCRIPTION (Intégrité): ETU2022_005721_23-24_SCIENCE_SV_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_TC) n'est pas présente dans la table « parcours ».
  | LIGNE_EXCEL_IDX: 85999
-2025-11-14 11:39:48,667 - ERROR - INSCRIPTION (Intégrité): ETU2022_015993_23-24_EMIT_INFO_DAII_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+2025-11-14 11:54:38,664 - ERROR - INSCRIPTION (Intégrité): ETU2022_005159_23-24_EMIT_MGMT_AES_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L3_S04) n'est pas présente dans la table « semestres ».
  | LIGNE_EXCEL_IDX: 86499
-2025-11-14 11:39:53,965 - ERROR - INSCRIPTION (Intégrité): ETU2022_022724_23-24_DEGSS_ECOGE_GME_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+2025-11-14 11:54:41,738 - ERROR - INSCRIPTION (Intégrité): ETU2022_019871_23-24_DEGSS_DROIT_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2023_040002) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 93499
-2025-11-14 11:39:59,022 - ERROR - INSCRIPTION (Intégrité): ETU2022_014320_23-24_SCIENCE_PA_EA2I_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_etudiant)=(ETU2023_036176) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 90499
+2025-11-14 11:54:42,104 - ERROR - INSCRIPTION (Intégrité): ETU2022_003001_23-24_DEGSS_DROIT_TC_S04 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_etudiant_fkey »
+DETAIL:  La clé (code_etudiant)=(ETU2023_029366) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 90999
+2025-11-14 11:54:51,018 - ERROR - INSCRIPTION (Intégrité): ETU2022_018197_24-25_EGSS-MCI_ECOGE_ECO_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 102499
+2025-11-14 11:54:51,360 - ERROR - INSCRIPTION (Intégrité): ETU2022_027240_24-25_EGSS-MCI_ECOGE_GME_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 102999
+2025-11-14 11:54:51,778 - ERROR - INSCRIPTION (Intégrité): ETU2022_025972_24-25_EGSS-MCI_ECOGE_GME_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_GME) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 103499
+2025-11-14 11:54:52,119 - ERROR - INSCRIPTION (Intégrité): ETU2022_004501_23-24_SCIENCE_SV_BT_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_GME) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 103999
+2025-11-14 11:54:55,607 - ERROR - INSCRIPTION (Intégrité): ETU2023_030018_23-24_DEGSS_ECOGE_ECO_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_etudiant_fkey »
+DETAIL:  La clé (code_etudiant)=(ETU2023_030072) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 108499
+2025-11-14 11:54:59,790 - ERROR - INSCRIPTION (Intégrité): ETU2022_008021_24-25_EMIT_RPM_CM_S05 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L2_S05) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 99999
-2025-11-14 11:40:03,464 - ERROR - INSCRIPTION (Intégrité): ETU2022_028210_23-24_DEGSS_DROIT_PRIVE_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L2_S05) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 105499
-2025-11-14 11:40:04,218 - ERROR - INSCRIPTION (Intégrité): ETU2022_022314_23-24_DEGSS_ECOGE_GME_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2023_040002) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 106499
-2025-11-14 11:40:09,364 - ERROR - INSCRIPTION (Intégrité): ETU2022_017179_23-24_SCIENCE_SV_BM_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L2_S06) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 112999
-2025-11-14 11:40:13,255 - ERROR - INSCRIPTION (Intégrité): ETU2022_028396_23-24_DEGSS_DROIT_PRIVE_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(L2_S06) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 113999
+2025-11-14 11:55:02,255 - ERROR - INSCRIPTION (Intégrité): ETU2022_018637_24-25_EGSS-MCI_ECOGE_GME_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 116999
+2025-11-14 11:55:02,594 - ERROR - INSCRIPTION (Intégrité): ETU2022_026018_24-25_EGSS-MCI_ECOGE_GME_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_GME) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 117499
+2025-11-14 11:55:02,937 - ERROR - INSCRIPTION (Intégrité): ETU2022_024480_24-25_EGSS-MCI_SS_ENV_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_GME) n'est pas présente dans la table « parcours ».
  | LIGNE_EXCEL_IDX: 117999
-2025-11-14 11:40:15,201 - ERROR - INSCRIPTION (Intégrité): ETU2023_036836_24-25_FLSH_COMM_COMM_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+2025-11-14 11:55:03,289 - ERROR - INSCRIPTION (Intégrité): ETU2022_004734_23-24_EMIT_MGMT_AES_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_SS_ENV) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 118499
+2025-11-14 11:55:06,854 - ERROR - INSCRIPTION (Intégrité): ETU2022_027592_23-24_DEGSS_ECOGE_GME_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_etudiant_fkey »
+DETAIL:  La clé (code_etudiant)=(ETU2023_030072) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 122999
+2025-11-14 11:55:11,077 - ERROR - INSCRIPTION (Intégrité): ETU2023_034756_24-25_EMIT_MGMT_AES_S06 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_semestre_fkey »
+DETAIL:  La clé (code_semestre)=(L2_S06) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 128499
+2025-11-14 11:55:12,635 - ERROR - INSCRIPTION (Intégrité): ETU2022_026440_24-25_EGSS-MCI_ECOGE_ECO_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 130499
+2025-11-14 11:55:13,002 - ERROR - INSCRIPTION (Intégrité): ETU2022_018287_24-25_EGSS-MCI_ECOGE_FC_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 130999
+2025-11-14 11:55:13,365 - ERROR - INSCRIPTION (Intégrité): ETU2022_024396_24-25_EGSS-MCI_SS_ENV_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_FC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 131499
+2025-11-14 11:55:13,725 - ERROR - INSCRIPTION (Intégrité): ETU2023_031803_23-24_EMIT_RPM_CNMP_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_SS_ENV) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 131999
+2025-11-14 11:55:16,877 - ERROR - INSCRIPTION (Intégrité): ETU2022_011470_23-24_ENI_IA_OCC_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(M2_S07) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 120499
-2025-11-14 11:40:16,340 - ERROR - INSCRIPTION (Intégrité): ETU2022_017886_23-24_SCIENCE_SV_BT_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M2_S07) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 121999
-2025-11-14 11:40:18,689 - ERROR - INSCRIPTION (Intégrité): ETU2022_020293_23-24_DEGSS_DROIT_PRIVE_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+ | LIGNE_EXCEL_IDX: 135999
+2025-11-14 11:55:17,599 - ERROR - INSCRIPTION (Intégrité): ETU2022_007774_24-25_EMIT_RPM_CNMP_S07 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
 DETAIL:  La clé (code_semestre)=(L3_S07) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 124999
-2025-11-14 11:40:20,227 - ERROR - INSCRIPTION (Intégrité): ETU2022_006203_24-25_FLSH_GEODD_EA_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M2_S08) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 126999
-2025-11-14 11:40:22,940 - ERROR - INSCRIPTION (Intégrité): ETU2022_010434_23-24_EMIT_MGMT_MEDA_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M2_S08) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 130499
-2025-11-14 11:40:25,603 - ERROR - INSCRIPTION (Intégrité): ETU2022_026564_22-23_MEDECINE_MED-HUM_MED-HUM_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S09) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 133999
-2025-11-14 11:40:26,755 - ERROR - INSCRIPTION (Intégrité): ETU2022_015286_23-24_ENS_ST_MATH_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S09) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 135499
-2025-11-14 11:40:27,191 - ERROR - INSCRIPTION (Intégrité): ETU2023_037745_23-24_SCIENCE_GSEEH_GIRE_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S09) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 135999
-2025-11-14 11:40:28,779 - ERROR - INSCRIPTION (Intégrité): ETU2022_019028_23-24_DEGSS_ECOGE_BF_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2022_011990) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 137999
-2025-11-14 11:40:30,452 - ERROR - INSCRIPTION (Intégrité): ETU2022_000901_22-23_FLSH_HCCA_HCCA_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
-étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S10) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 136999
+2025-11-14 11:55:19,108 - ERROR - INSCRIPTION (Intégrité): ETU2022_027783_24-25_EGSS-MCI_ECOGE_FC_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_ECO) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 138999
+2025-11-14 11:55:19,469 - ERROR - INSCRIPTION (Intégrité): ETU2022_024278_24-25_EGSS-MCI_SS_POL_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_FC) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 139499
+2025-11-14 11:55:19,835 - ERROR - INSCRIPTION (Intégrité): ETU2022_007775_23-24_EMIT_RPM_CM_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_SS_POL) n'est pas présente dans la table « parcours ».
  | LIGNE_EXCEL_IDX: 139999
-2025-11-14 11:40:30,812 - ERROR - INSCRIPTION (Intégrité): ETU2022_015357_22-23_ENS_SE_FAD_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+2025-11-14 11:55:24,189 - ERROR - INSCRIPTION (Intégrité): ETU2022_005164_23-24_ENI_IA_GID_S08 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S10) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 140499
-2025-11-14 11:40:31,197 - ERROR - INSCRIPTION (Intégrité): ETU2023_032940_23-24_EMIT_MGMT_MD_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_semestre)=(M2_S08) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 145499
+2025-11-14 11:55:26,147 - ERROR - INSCRIPTION (Intégrité): ETU2022_023755_24-25_EGSS-MCI_ECOGE_BF_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_BF) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 147999
+2025-11-14 11:55:26,580 - ERROR - INSCRIPTION (Intégrité): ETU2023_031773_23-24_EMIT_MGMT_MD_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_DPA) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 148499
+2025-11-14 11:55:28,567 - ERROR - INSCRIPTION (Intégrité): ETU2022_011178_22-23_FLSH_LMT_LMT_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_semestre_fkey »
-DETAIL:  La clé (code_semestre)=(M1_S10) n'est pas présente dans la table « semestres ».
- | LIGNE_EXCEL_IDX: 140999
-2025-11-14 11:40:32,370 - ERROR - INSCRIPTION (Intégrité): ETU2022_011956_22-23_EMIT_INFO_SIGD-M2I_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+DETAIL:  La clé (code_semestre)=(M1_S09) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 150999
+2025-11-14 11:55:28,927 - ERROR - INSCRIPTION (Intégrité): ETU2022_008993_23-24_FLSH_COMM_COMM_S09 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_semestre_fkey »
+DETAIL:  La clé (code_semestre)=(M1_S09) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 151499
+2025-11-14 11:55:29,695 - ERROR - INSCRIPTION (Intégrité): ETU2022_023583_22-23_ENI_INFO_IG_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
 étrangère « inscriptions_code_etudiant_fkey »
-DETAIL:  La clé (code_etudiant)=(ETU2022_011990) n'est pas présente dans la table « etudiants ».
- | LIGNE_EXCEL_IDX: 142499
+DETAIL:  La clé (code_etudiant)=(ETU2022_025435) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 152499
+2025-11-14 11:55:30,441 - ERROR - INSCRIPTION (Intégrité): ETU2022_023790_24-25_EGSS-MCI_ECOGE_BF_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_BF) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 153499
+2025-11-14 11:55:30,789 - ERROR - INSCRIPTION (Intégrité): ETU2023_030872_23-24_EMIT_INFO_SIGD_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_id_parcours_fkey »
+DETAIL:  La clé (id_parcours)=(EGSS-MCI_ECOGE_DPA) n'est pas présente dans la table « parcours ».
+ | LIGNE_EXCEL_IDX: 153999
+2025-11-14 11:55:32,691 - ERROR - INSCRIPTION (Intégrité): ETU2023_036834_23-24_ISTE_ENV_ESDD_S10 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_semestre_fkey »
+DETAIL:  La clé (code_semestre)=(M1_S10) n'est pas présente dans la table « semestres ».
+ | LIGNE_EXCEL_IDX: 156499
+2025-11-14 11:55:33,813 - ERROR - INSCRIPTION (Intégrité): ETU2022_001022_23-24_MEDECINE_MED-HUM_MED-HUM_S12 | Détail: ERREUR:  une instruction insert ou update sur la table « inscriptions » viole la contrainte de clé
+étrangère « inscriptions_code_etudiant_fkey »
+DETAIL:  La clé (code_etudiant)=(ETU2022_025435) n'est pas présente dans la table « etudiants ».
+ | LIGNE_EXCEL_IDX: 157999

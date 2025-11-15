@@ -14,8 +14,10 @@ from models import (
     Institution, Composante, Domaine, Mention, Parcours, 
     AnneeUniversitaire, Etudiant, Inscription,
     # CLASSES LMD & MODE INSCRIPTION
-    Cycle, Niveau, Semestre, ModeInscription, SessionExamen, # ✅ ModeInscription
-    TypeFormation # 👈 AJOUT de TypeFormation
+    Cycle, Niveau, Semestre, ModeInscription, SessionExamen,
+    TypeFormation,
+    # AJOUT POTENTIEL des nouvelles classes pour l'orchestrateur (même si non importées ici)
+    Enseignant, Jury # Ajout pour être complet si les imports de Notes/Enseignants sont faits plus tard
 )
 
 # Configuration du logging (inchangée)
@@ -36,14 +38,38 @@ def safe_string(s):
 
 
 # ----------------------------------------------------------------------
+# GÉNÉRATION DES DONNÉES D'ANNÉE UNIVERSITAIRE
+# ----------------------------------------------------------------------
+
+def _generate_annee_data(start_year: int = 2021, end_year: int = 2026) -> list:
+    """
+    Génère les données des années universitaires avec leur ordre chronologique.
+    L'ordre commence à 0 pour 2021-2022.
+    """
+    annee_list = []
+    
+    # Ordre commence à 0 pour 2021-2022
+    for i in range(end_year - start_year + 1):
+        annee_start = start_year + i
+        annee_end = annee_start + 1
+        annee_str = f"{annee_start}-{annee_end}"
+        
+        annee_list.append({
+            'annee': annee_str,
+            'ordre_annee': i, # 0, 1, 2, 3, 4, 5...
+            'description': f"Année académique {annee_str}"
+        })
+    return annee_list
+
+# ----------------------------------------------------------------------
 # FONCTIONS D'IMPORTATION DES DONNÉES DE RÉFÉRENCE FIXES
 # ----------------------------------------------------------------------
 
 def import_fixed_references(session: Session):
     """
-    Insère les données de référence fixes (Cycles, Niveaux, Semestres, Types Inscription, Sessions, Types Formation).
+    Insère les données de référence fixes (Cycles, Niveaux, Semestres, Types Inscription, Sessions, Types Formation, ANNEES UNIVERSITAIRES).
     """
-    print("\n--- 1. Importation des Données de Référence Fixes (LMD & Types) ---")
+    print("\n--- 1. Importation des Données de Référence Fixes (LMD, Types & Années Univ.) ---")
     
     # 1. Cycles
     cycles_data = [
@@ -72,8 +98,6 @@ def import_fixed_references(session: Session):
         session.merge(Niveau(code=niv_code, label=niv_code, cycle_code=cycle_code))
         
         for sem_num in sem_list:
-            
-            # Insertion de la clé complète (NIVEAU_SEMESTRE) - Ex: L1_S01
             sem_code_complet = f"{niv_code}_{sem_num}" 
             session.merge(Semestre(
                 code_semestre=sem_code_complet,
@@ -82,7 +106,7 @@ def import_fixed_references(session: Session):
             ))
             all_semestre_codes.append(sem_code_complet) 
 
-    # 3. Modes Inscription (Anciennement Types Inscription)
+    # 3. Modes Inscription
     modes_inscription_data = [
         {'code': 'CLAS', 'label': 'Classique'},
         {'code': 'HYB', 'label': 'Hybride'},
@@ -90,7 +114,7 @@ def import_fixed_references(session: Session):
     for data in modes_inscription_data:
         session.merge(ModeInscription(**data))
         
-    # 4. Insertion des Sessions d'Examen (SessionExamen)
+    # 4. Insertion des Sessions d'Examen
     session_examen_data = [
         {'code_session': 'N', 'label': 'Normale'},
         {'code_session': 'R', 'label': 'Rattrapage'},
@@ -98,7 +122,7 @@ def import_fixed_references(session: Session):
     for sess in session_examen_data:
         session.merge(SessionExamen(**sess))
 
-    # 5. Insertion des Types de Formation (TypeFormation) 👈 NOUVELLE ÉTAPE
+    # 5. Insertion des Types de Formation
     types_formation_data = [
         {'code': 'FI', 'label': 'Formation Initiale', 'description': 'Formation classique à temps plein.'},
         {'code': 'FC', 'label': 'Formation Continue', 'description': 'Formation destinée aux professionnels en activité.'},
@@ -107,9 +131,13 @@ def import_fixed_references(session: Session):
     for data in types_formation_data:
         session.merge(TypeFormation(**data))
         
+    # 6. 🚨 NOUVELLE ÉTAPE : Insertion des Années Universitaires avec Ordre
+    annees_data = _generate_annee_data(start_year=2021, end_year=2026)
+    for data in annees_data:
+        session.merge(AnneeUniversitaire(**data))
+        
     session.commit()
-    print("✅ Données de Référence LMD, Types Inscription, Sessions d'Examen et Types Formation insérées.")
-
+    print("✅ Données de Référence LMD, Types, Sessions et **Années Universitaires** insérées.")
 
 # ----------------------------------------------------------------------
 # FONCTIONS D'IMPORTATION UNITAIRE DE LA STRUCTURE ACADÉMIQUE
@@ -291,7 +319,6 @@ def import_metadata_to_db():
 def _load_and_clean_inscriptions():
     """
     Charge, nettoie et enrichit le fichier d'inscriptions.
-    MODIFIÉ: Utilise la colonne 'niveau' (L1, M1, etc.) pour enrichir le code_semestre.
     """
     try:
         df = pd.read_excel(config.INSCRIPTION_FILE_PATH)
@@ -304,7 +331,7 @@ def _load_and_clean_inscriptions():
         df = df.where(pd.notnull(df), None) 
         print(f"Fichier XLSX d'inscriptions chargé. {len(df)} lignes trouvées.")
         
-        # --- Nettoyage et Enrichissement des clés critiques ---
+        # --- Nettoyage et Enrichissement des clés critiques (INCHANGÉES) ---
         if 'id_parcours_caractere' in df.columns:
             df.rename(columns={'id_parcours_caractere': 'id_parcours'}, inplace=True) 
         if 'id_parcours' in df.columns:
@@ -319,7 +346,6 @@ def _load_and_clean_inscriptions():
         
         # 🚨 CORRECTION CRITIQUE 1: DÉTECTION ET UTILISATION DE LA COLONNE 'NIVEAU' 🚨
         if 'niveau' in df.columns:
-            # 1. Renommer 'niveau' en 'niveau_code' pour l'utiliser dans la logique
             df.rename(columns={'niveau': 'niveau_code'}, inplace=True)
             print("✅ Colonne 'niveau' détectée et renommée en 'niveau_code'.")
         
@@ -327,12 +353,10 @@ def _load_and_clean_inscriptions():
         if 'code_semestre' in df.columns:
             df['code_semestre'] = df['code_semestre'].astype(str).apply(safe_string)
             
-            # Application de l'enrichissement si la colonne niveau_code est maintenant présente
             if 'niveau_code' in df.columns:
                 df['niveau_code'] = df['niveau_code'].astype(str).apply(safe_string)
                 df['code_semestre'] = df.apply(
                     lambda row: f"{row['niveau_code']}_{row['code_semestre']}" 
-                    # Enrichir seulement si le code n'est pas déjà au format L1_S01 (pas de '_')
                     if pd.notna(row.get('niveau_code')) 
                     and row['code_semestre']
                     and '_' not in str(row['code_semestre'])
@@ -341,54 +365,40 @@ def _load_and_clean_inscriptions():
                 )
                 print("✅ Code_semestre enrichi avec le niveau (Ex: L1_S01).")
             else:
-                 # Le message d'avertissement est conservé mais la cause est que ni 'niveau' ni 'niveau_code' n'a été trouvé
-                 print("\n⚠️ ATTENTION: Colonne 'niveau' (ou 'niveau_code') manquante pour enrichir le code_semestre. Risque d'erreurs FK.")
+                print("\n⚠️ ATTENTION: Colonne 'niveau' (ou 'niveau_code') manquante pour enrichir le code_semestre. Risque d'erreurs FK.")
 
         
-        # 2. Renommage et Standardisation du Type Inscription -> Mode Inscription
+        # 2. Renommage et Standardisation du Mode Inscription
         if 'type_formation' in df.columns:
+            if 'code_mode_inscription' not in df.columns: 
+                df.rename(columns={'type_formation': 'code_mode_inscription'}, inplace=True)
             
-            # Renommage
-            if 'code_mode_inscription' not in df.columns: # ✅ CHANGEMENT ICI
-                # Si type_formation existe, on le renomme en code_mode_inscription
-                df.rename(columns={'type_formation': 'code_mode_inscription'}, inplace=True) # ✅ CHANGEMENT ICI
-            
-            # Standardisation des valeurs (CLASSIQUE/HYBRIDE -> CLAS/HYB)
-            df.loc[:, 'code_mode_inscription'] = df['code_mode_inscription'].astype(str).str.upper().replace({ # ✅ CHANGEMENT ICI
+            df.loc[:, 'code_mode_inscription'] = df['code_mode_inscription'].astype(str).str.upper().replace({ 
                 'CLASSIQUE': 'CLAS',
                 'HYBRIDE': 'HYB'
             })
         
-        # S'assurer que le nettoyage final est appliqué aux codes d'inscription et gérer les valeurs vides/NaN après le replace
-        if 'code_mode_inscription' in df.columns: # ✅ CHANGEMENT ICI
-            df['code_mode_inscription'] = df['code_mode_inscription'].astype(str).apply(safe_string) # ✅ CHANGEMENT ICI
+        if 'code_mode_inscription' in df.columns: 
+            df['code_mode_inscription'] = df['code_mode_inscription'].astype(str).apply(safe_string)
 
-        # 🚨 AJOUT DE LA GARANTIE DE COLONNE 🚨
-        if 'code_mode_inscription' not in df.columns: # ✅ CHANGEMENT ICI
-            # Si la colonne n'a jamais existé
-            df['code_mode_inscription'] = 'CLAS' # ✅ CHANGEMENT ICI
-            print("ℹ️ Colonne 'code_mode_inscription' ajoutée avec la valeur par défaut 'CLAS'.") # ✅ CHANGEMENT ICI
+        if 'code_mode_inscription' not in df.columns: 
+            df['code_mode_inscription'] = 'CLAS' 
+            print("ℹ️ Colonne 'code_mode_inscription' ajoutée avec la valeur par défaut 'CLAS'.") 
+
+        # 🚨 VÉRIFICATION ET AJOUT DU TYPE DE FORMATION 🚨
+        if 'type_formation_code' in df.columns:
+            df['code_type_formation'] = df['type_formation_code'].astype(str).apply(safe_string)
+            print("✅ Colonne 'type_formation_code' renommée en 'code_type_formation'.")
+        
+        if 'code_type_formation' not in df.columns:
+            df['code_type_formation'] = 'FI' # Valeur par défaut si non trouvé
+            print("ℹ️ Colonne 'code_type_formation' ajoutée avec la valeur par défaut 'FI'.")
 
         return df
         
     except Exception as e:
         print(f"❌ ERREUR: Impossible de lire ou de nettoyer le fichier d'inscriptions. {e}", file=sys.stderr)
         return None
-
-
-def _import_annees_universitaires(session: Session, df: pd.DataFrame):
-    """Importe les Années Universitaires."""
-    print("\n--- Importation des Années Universitaires ---")
-    if 'annee_universitaire' not in df.columns:
-         print("Colonne 'annee_universitaire' manquante pour l'import des années universitaires.")
-         return
-         
-    annees = df['annee_universitaire'].drop_duplicates().dropna()
-    for annee in tqdm(annees, desc="Années Univ."):
-        session.merge(AnneeUniversitaire(annee=safe_string(annee)))
-    session.commit()
-    print("✅ Années Universitaires insérées/mises à jour.")
-
 
 def _import_etudiants(session: Session, df: pd.DataFrame):
     """Importe les Étudiants (commit par ligne)."""
@@ -443,7 +453,8 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
     """Importe les Inscriptions (commit par lot)."""
     print("\n--- Importation des Inscriptions ---")
     
-    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_mode_inscription'] # ✅ Changement ici
+    # AJOUT DE code_type_formation
+    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_mode_inscription', 'code_type_formation'] 
     df_inscriptions = df.dropna(subset=cles_requises)
     
     errors_fk, errors_uq, errors_data, errors_other = 0, 0, 0, 0
@@ -458,14 +469,16 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
                 annee_universitaire=safe_string(row['annee_universitaire']), 
                 id_parcours=row['id_parcours'], 
                 code_semestre=safe_string(row['code_semestre']), 
-                code_mode_inscription=safe_string(row.get('code_mode_inscription', 'CLAS')), # ✅ CHANGEMENT ICI
+                code_mode_inscription=safe_string(row.get('code_mode_inscription', 'CLAS')), 
+                # 🚨 AJOUT DE LA COLONNE code_type_formation 🚨
+                code_type_formation=safe_string(row.get('code_type_formation', 'FI')), # Valeur par défaut 'FI' si manquante dans le DF
                 # credit_acquis_semestre et is_semestre_valide ont des valeurs par défaut
             ))
             
             if (index + 1) % 500 == 0:
                 session.commit()
                 
-        # Gestion des erreurs 
+        # Gestion des erreurs (inchangée) 
         except IntegrityError as e:
             session.rollback()
             e_msg = str(e.orig).lower()
@@ -497,7 +510,7 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
 
 
 # ----------------------------------------------------------------------
-# FONCTION ORCHESTRATRICE DES INSCRIPTIONS
+# FONCTION ORCHESTRATRICE DES INSCRIPTIONS (MODIFIÉE)
 # ----------------------------------------------------------------------
 
 def import_inscriptions_to_db():
@@ -506,20 +519,16 @@ def import_inscriptions_to_db():
     """
     print(f"\n--- 3. Démarrage de l'importation des inscriptions et étudiants ---")
     
-    # 🚨 VÉRIFICATION CRITIQUE: La fonction doit être appelée sans argument session 
-    # si elle est définie comme telle, et le résultat vérifié immédiatement.
     df_inscriptions = _load_and_clean_inscriptions() 
     
-    # === 🚨 AJOUT/VÉRIFICATION DU CONTRÔLE DE SÉCURITÉ (Guard Clause) 🚨 ===
     if df_inscriptions is None:
         print("❌ Importation des inscriptions annulée car le fichier de données est illisible ou corrompu.")
         return
-    # =======================================================================
         
     session = database_setup.get_session()
     
     try:
-        _import_annees_universitaires(session, df_inscriptions)
+        # ❌ L'importation des années universitaires a été déplacée vers import_fixed_references
         _import_etudiants(session, df_inscriptions)
         _import_inscriptions(session, df_inscriptions)
 
@@ -528,7 +537,7 @@ def import_inscriptions_to_db():
 
 
 # ----------------------------------------------------------------------
-# BLOC PRINCIPAL ET ORCHESTRATEUR GLOBAL
+# BLOC PRINCIPAL ET ORCHESTRATEUR GLOBAL (INCHANGÉ)
 # ----------------------------------------------------------------------
 
 def import_all_data():
@@ -545,9 +554,13 @@ def import_all_data():
         import_fixed_references(session)
         
         session.commit()
+        # Note: Dans un environnement réel, on pourrait avoir besoin de commiter ici
+        # pour que les autres sessions (de l'orchestrateur de metadata) voient les FK.
         import_metadata_to_db() 
         
-        session.commit()
+        # Le commit sera fait par l'orchestrateur de metadata, ici on s'assure que 
+        # les inscriptions suivantes voient les données.
+        session.commit() 
         import_inscriptions_to_db()
         
         print("\n=====================================================")
@@ -562,4 +575,6 @@ def import_all_data():
 
 
 if __name__ == '__main__':
+    # Exécution de la fonction principale si le fichier est exécuté
+    import_all_data() 
     pass

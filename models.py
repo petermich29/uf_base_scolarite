@@ -229,6 +229,7 @@ class AnneeUniversitaire(Base):
     
     annee = Column(String(9), primary_key=True)
     description = Column(Text, nullable=True) 
+    ordre_annee = Column(Integer, unique=True, nullable=False) # 👈 AJOUT IMPORTANT
     
     # Correction des back_populates
     inscriptions = relationship("Inscription", back_populates="annee_univ")
@@ -503,6 +504,9 @@ class Enseignant(Base):
     composante_attachement = relationship("Composante", back_populates="enseignants_permanents")
     charges_enseignement = relationship("AffectationEC", back_populates="enseignant")
 
+    # 🚨 NOUVELLE RELATION : Présidences de jury
+    presidences_jury = relationship("Jury", back_populates="enseignant_president") # 👈 NOUVEL AJOUT
+
 
 class TypeEnseignement(Base):
     """ Types de charge: Cours, TD, TP """
@@ -573,4 +577,43 @@ class AffectationEC(Base):
     type_enseignement = relationship("TypeEnseignement", back_populates="affectations")
     annee_univ_affectation = relationship("AnneeUniversitaire", back_populates="affectations_ec")
 
+# ===================================================================
+# --- TABLES DE DONNÉES: GESTION DES JURYS D'EXAMEN (MODIFIÉE) ---
+# ===================================================================
+
+class Jury(Base):
+    """
+    Associe un enseignant (président) à un jury de session de semestre.
+    La nomination vaut pour toutes les sessions (N et R) du semestre concerné.
+    """
+    __tablename__ = 'jurys'
+    __table_args__ = (
+        # CHANGEMENT : Un seul président pour un semestre et une année,
+        # la nomination s'appliquant implicitement aux sessions N et R.
+        UniqueConstraint('code_semestre', 'annee_universitaire', name='uq_jury_unique'), 
+        {'extend_existing': True}
+    )
     
+    id_jury = Column(Integer, primary_key=True, autoincrement=True)
+    
+    # Clés Étrangères Composites
+    id_enseignant = Column(String(50), ForeignKey('enseignants.id_enseignant'), nullable=False)
+    code_semestre = Column(String(10), ForeignKey('semestres.code_semestre'), nullable=False)
+    annee_universitaire = Column(String(9), ForeignKey('annees_universitaires.annee'), nullable=False)
+    
+    # ❌ SUPPRESSION : La colonne code_session n'est plus nécessaire.
+    # code_session = Column(String(5), ForeignKey('sessions_examen.code_session'), nullable=False)
+    
+    date_nomination = Column(Date, nullable=True) 
+    
+    # Relations
+    enseignant_president = relationship("Enseignant", back_populates="presidences_jury")
+    semestre_jury = relationship("Semestre")
+    annee_univ_jury = relationship("AnneeUniversitaire")
+    
+    # ❌ SUPPRESSION de la relation vers SessionExamen
+    # session_jury = relationship("SessionExamen") 
+    
+    def __repr__(self):
+        return (f"<Jury Sémestre {self.code_semestre} ({self.annee_universitaire}) "
+                f"présidé par {self.id_enseignant}>")
