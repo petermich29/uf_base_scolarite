@@ -22,6 +22,9 @@ class Institution(Base):
     type_institution = Column(String(10), nullable=False)
     description = Column(Text, nullable=True)
     
+    # 🖼️ AJOUT DE CHAMP DE FICHIER
+    logo_path = Column(String(255), nullable=True)
+    
     composantes = relationship("Composante", back_populates="institution")
 
 
@@ -29,29 +32,29 @@ class Composante(Base):
     __tablename__ = 'composantes'
     __table_args__ = {'extend_existing': True}
     
-    code = Column(String(10), primary_key=True)
+    code = Column(String(50), primary_key=True)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
+    
+    # 🖼️ AJOUT DE CHAMP DE FICHIER
+    logo_path = Column(String(255), nullable=True)
     
     id_institution = Column(String(32), ForeignKey('institutions.id_institution'), nullable=False) 
     institution = relationship("Institution", back_populates="composantes")
     
     mentions = relationship("Mention", backref="composante")
 
-    # 🚨 CORRECTION DANS COMPOSANTE: Utiliser back_populates
     enseignants_permanents = relationship("Enseignant", back_populates="composante_attachement")
-
 
 class Domaine(Base):
     __tablename__ = 'domaines'
     __table_args__ = {'extend_existing': True}
     
-    code = Column(String(10), primary_key=True)
+    code = Column(String(20), primary_key=True)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
     mentions = relationship("Mention", backref="domaine")
-
 
 class Mention(Base):
     __tablename__ = 'mentions'
@@ -61,15 +64,17 @@ class Mention(Base):
     )
     
     id_mention = Column(String(50), primary_key=True) 
-    code_mention = Column(String(20), nullable=False)
+    code_mention = Column(String(30), nullable=False)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
-    composante_code = Column(String(10), ForeignKey('composantes.code'), nullable=False)
-    domaine_code = Column(String(10), ForeignKey('domaines.code'), nullable=False)
+    # 🖼️ Ajout du champ de fichier pour Mention
+    logo_path = Column(String(255), nullable=True) 
+    
+    composante_code = Column(String(50), ForeignKey('composantes.code'), nullable=False)
+    domaine_code = Column(String(20), ForeignKey('domaines.code'), nullable=False)
     
     parcours = relationship("Parcours", backref="mention")
-
 
 class Parcours(Base):
     __tablename__ = 'parcours'
@@ -82,6 +87,9 @@ class Parcours(Base):
     code_parcours = Column(String(20), nullable=False)
     label = Column(String(100))
     description = Column(Text, nullable=True) 
+    
+    # 🖼️ AJOUT DE CHAMP DE FICHIER
+    logo_path = Column(String(255), nullable=True)
     
     mention_id = Column(String(50), ForeignKey('mentions.id_mention'), nullable=False)
     
@@ -242,23 +250,14 @@ class AnneeUniversitaire(Base):
 class Etudiant(Base):
     __tablename__ = 'etudiants'
     __table_args__ = (
-        # ❌ CETTE LIGNE EST SUPPRIMÉE : 
-        # CheckConstraint("sexe IN ('M', 'F', 'Autre')", name='check_sexe_mf_autre'),
-        
-        # ⚠️ NOTE: Si vous aviez d'autres arguments dans __table_args__ (comme UniqueConstraint, etc.), 
-        # ils doivent être conservés. Si seule la contrainte de sexe était présente, 
-        # vous pouvez utiliser un tuple vide ou supprimer complètement __table_args__.
         {'extend_existing': True} 
     )
     
     code_etudiant = Column(String(50), primary_key=True) 
-
-    # 🚨 CORRECTION: Contrainte UNIQUE retirée
-    numero_inscription = Column(String(50))
-    
+    numero_inscription = Column(String(100))
     nom = Column(String(100), nullable=False)
     prenoms = Column(String(150))
-    sexe = Column(String(20)) # Laissez le type String(20)
+    sexe = Column(String(20)) 
 
     naissance_date = Column(Date, nullable=True)
     naissance_lieu = Column(String(100))
@@ -275,16 +274,18 @@ class Etudiant(Base):
     cin = Column(String(100))
     cin_date = Column(Date, nullable=True)
     cin_lieu = Column(String(100))
+    
+    # 🖼️ AJOUT DE CHAMPS DE FICHIERS POUR L'ÉTUDIANT
+    photo_profil_path = Column(String(255), nullable=True)
+    scan_cin_path = Column(String(255), nullable=True)
+    scan_releves_notes_bacc_path = Column(String(255), nullable=True)
 
     # Relations 
     inscriptions = relationship("Inscription", back_populates="etudiant")
-    # 🚨 MISE À JOUR: Utilisation de 'notes_obtenues' pour harmoniser avec la classe Note
     notes_obtenues = relationship("Note", back_populates="etudiant") 
     credits_cycles = relationship("SuiviCreditCycle", back_populates="etudiant")
-    
-    # 🚨 AJOUT DE LA RELATION
     resultats_ue = relationship("ResultatUE", back_populates="etudiant") 
-    resultats_semestre = relationship("ResultatSemestre", back_populates="etudiant_resultat") # Gardé backref ici pour simplicité
+    resultats_semestre = relationship("ResultatSemestre", back_populates="etudiant_resultat")
 
 
 class Inscription(Base):
@@ -300,7 +301,7 @@ class Inscription(Base):
         {'extend_existing': True} 
     )
     
-    code_inscription = Column(String(50), primary_key=True)
+    code_inscription = Column(String(100), primary_key=True)
     
     # Clés étrangères
     code_etudiant = Column(String(50), ForeignKey('etudiants.code_etudiant'), nullable=False)
@@ -467,13 +468,12 @@ class SuiviCreditCycle(Base):
 class Enseignant(Base):
     __tablename__ = 'enseignants'
     __table_args__ = (
-        # Assure l'unicité de CIN si non nul
         UniqueConstraint('cin', name='uq_enseignant_cin', deferrable=True),
         {'extend_existing': True}
     )
     
     id_enseignant = Column(String(50), primary_key=True) 
-    matricule = Column(String(50), unique=True, nullable=True) # Matricule si permanent
+    matricule = Column(String(50), unique=True, nullable=True) 
 
     nom = Column(String(100), nullable=False)
     prenoms = Column(String(150))
@@ -482,13 +482,10 @@ class Enseignant(Base):
     
     # Renseignement administratifs/carrière
     grade = Column(String(50))
-    # 🚨 CORRECTION CRUCIALE : Tout sur une seule ligne si possible ou structure stricte
     statut = Column(String(10), 
-                    CheckConstraint("statut IN ('PERM', 'VAC')", name='check_statut_enseignant'), # Argument positionnel (la contrainte)
-                    nullable=False) # Argument mot-clé, doit venir APRÈS la contrainte si elle n'est pas nommée
-
-    # Affectation composante (Obligatoire pour un permanent)
-    code_composante_affectation = Column(String(10), 
+                    CheckConstraint("statut IN ('PERM', 'VAC')", name='check_statut_enseignant'), 
+                    nullable=False)
+    code_composante_affectation = Column(String(50), 
                                          ForeignKey('composantes.code'), 
                                          nullable=True)
     
@@ -498,14 +495,15 @@ class Enseignant(Base):
     cin_lieu = Column(String(100))
     telephone = Column(String(50))
     mail = Column(String(100))
-    rib = Column(String(100)) # Relevé d'Identité Bancaire
+    rib = Column(String(100)) 
+    
+    # 🖼️ AJOUT DE CHAMPS DE FICHIERS POUR L'ENSEIGNANT
+    photo_profil_path = Column(String(255), nullable=True)
+    scan_cin_path = Column(String(255), nullable=True)
 
-    # 🚨 CORRECTION DANS ENSEIGNANT: Renommer la relation côté enfant
     composante_attachement = relationship("Composante", back_populates="enseignants_permanents")
     charges_enseignement = relationship("AffectationEC", back_populates="enseignant")
-
-    # 🚨 NOUVELLE RELATION : Présidences de jury
-    presidences_jury = relationship("Jury", back_populates="enseignant_president") # 👈 NOUVEL AJOUT
+    presidences_jury = relationship("Jury", back_populates="enseignant_president")
 
 
 class TypeEnseignement(Base):

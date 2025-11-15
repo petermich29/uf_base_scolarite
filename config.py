@@ -18,6 +18,11 @@ METADATA_FILE_PATH = r"C:\Users\OCELOU\Desktop\UF_DSE_DRIVE\UF_datasets\PYTHON\C
 INSCRIPTION_FILE_PATH = r"C:\Users\OCELOU\Desktop\UF_DSE_DRIVE\UF_datasets\POWERQUERY\_UFALLTIME__KEYED.xlsx"
 # ----------------------------------------
 
+# --- Chemins vers les dossiers de ressources statiques ---
+# 🖼️ Nouveau chemin pour le dossier des logos
+LOGO_FOLDER_PATH = r"C:\Users\OCELOU\Desktop\UF_DSE_DRIVE\UF_datasets\POWERQUERY\db_sco\logo"
+# ----------------------------------------
+
 # --- URLs de Connexion (avec correction d'encodage) ---
 # Ajout de client_encoding=windows-1252 dans la Query String pour la robustesse
 
