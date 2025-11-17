@@ -17,7 +17,7 @@ from models import (
     AnneeUniversitaire, Etudiant, Inscription,
     # CLASSES LMD & MODE INSCRIPTION
     Cycle, Niveau, Semestre, ModeInscription, SessionExamen,
-    TypeFormation,
+    TypeFormation, ParcoursNiveau,
     # AJOUT POTENTIEL des nouvelles classes
     Enseignant, Jury
 )
@@ -430,7 +430,7 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
     """Importe les Inscriptions (commit par lot)."""
     print("\n--- Importation des Inscriptions ---")
     
-    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_mode_inscription', 'code_type_formation'] 
+    cles_requises = ['code_inscription', 'code_etudiant', 'annee_universitaire', 'id_parcours', 'code_semestre', 'code_mode_inscription'] 
     df_inscriptions = df.dropna(subset=cles_requises)
     
     errors_fk, errors_uq, errors_data, errors_other = 0, 0, 0, 0
@@ -446,7 +446,6 @@ def _import_inscriptions(session: Session, df: pd.DataFrame):
                 id_parcours=row['id_parcours'], 
                 code_semestre=safe_string(row['code_semestre']), 
                 code_mode_inscription=safe_string(row.get('code_mode_inscription', 'CLAS')), 
-                code_type_formation=safe_string(row.get('code_type_formation', 'FI')), 
             ))
             
             if (index + 1) % 500 == 0:
@@ -503,7 +502,76 @@ def import_inscriptions_to_db(session: Session):
 
 
 # ----------------------------------------------------------------------
-# BLOC PRINCIPAL ET ORCHESTRATEUR GLOBAL
+# FONCTION DE DÉDUCTION DES LIAISONS PARCOURS <-> NIVEAU
+# ----------------------------------------------------------------------
+
+def _deduce_parcours_niveaux(session: Session):
+    """
+    Déduit et importe les liaisons Parcours <-> Niveau à partir 
+    des inscriptions existantes (Inscription.id_parcours -> Inscription.code_semestre -> Semestre.niveau_code).
+    """
+    print("\n--- 4. Déduction et Insertion des Liaisons Parcours <-> Niveau ---")
+    
+    # 1. Requête SQLAchemy pour trouver toutes les paires uniques (Parcours ID, Niveau Code)
+    # L'objectif est de trouver tous les niveaux (L1, M1, etc.) auxquels un parcours a été associé via une inscription.
+    try:
+        # Jointure: Inscription -> Semestre -> Niveau
+        results = (
+            session.query(
+                Inscription.id_parcours, 
+                Niveau.code # Aliasé comme 'niveau_code'
+            )
+            .join(Semestre, Inscription.code_semestre == Semestre.code_semestre)
+            .join(Niveau, Semestre.niveau_code == Niveau.code)
+            .distinct()
+            .all()
+        )
+        
+        print(f"Trouvé {len(results)} paires uniques (Parcours, Niveau) à insérer.")
+
+        if not results:
+            print("Aucune paire Parcours/Niveau déduite des inscriptions. Importation ignorée.")
+            return
+
+        # 2. Préparation et Insertion des objets ParcoursNiveau
+        records_to_insert = []
+        parcours_niveaux_map = {}
+        
+        # Grouper les niveaux par parcours pour déterminer l'ordre
+        for parcours_id, niveau_code in results:
+            if parcours_id not in parcours_niveaux_map:
+                parcours_niveaux_map[parcours_id] = []
+            parcours_niveaux_map[parcours_id].append(niveau_code)
+
+        # Les codes de niveau sont ['L1', 'L2', 'L3', 'M1', 'M2', 'D1', 'D2', 'D3']
+        # Utiliser un ordre fixe pour les niveaux afin de trier correctement (L1 -> L2 -> L3 -> M1...)
+        NIVEAU_ORDRE = {'L1': 1, 'L2': 2, 'L3': 3, 'M1': 4, 'M2': 5, 'D1': 6, 'D2': 7, 'D3': 8}
+        
+        for parcours_id, niveaux in parcours_niveaux_map.items():
+            
+            # Trier les niveaux déduits selon l'ordre académique L1, L2, L3...
+            niveaux_tries = sorted(niveaux, key=lambda n: NIVEAU_ORDRE.get(n, 99))
+            
+            for index, niv_code in enumerate(niveaux_tries):
+                records_to_insert.append(ParcoursNiveau(
+                    id_parcours=parcours_id,
+                    code_niveau=niv_code,
+                    ordre_niveau_parcours=index + 1 
+                ))
+
+        # 3. Insertion en lot
+        session.bulk_save_objects(records_to_insert)
+        session.commit()
+        print(f"✅ Insertion de {len(records_to_insert)} liaisons ParcoursNiveau terminée.")
+
+    except Exception as e:
+        session.rollback()
+        print(f"\n❌ ERREUR lors de la déduction des ParcoursNiveaux: {e}", file=sys.stderr)
+        logging.error(f"DEDUCTION_PN: Erreur fatale lors de la déduction. Détail: {e}")
+
+
+# ----------------------------------------------------------------------
+# BLOC PRINCIPAL ET ORCHESTRATEUR GLOBAL MIS À JOUR
 # ----------------------------------------------------------------------
 
 def import_all_data():
@@ -514,22 +582,23 @@ def import_all_data():
     print("🚀 DÉMARRAGE DU PROCESSUS D'IMPORTATION DE DONNÉES 🚀")
     print("=====================================================")
     
-    session = database_setup.get_session() # Une seule session pour tout l'orchestrateur
+    session = database_setup.get_session() 
     
     try:
         # 1. Importation des références fixes (Cycles, Niveaux, Semestres, Années)
         import_fixed_references(session)
         
         # 2. Importation de la structure académique (Institutions, Composantes, etc.)
-        # NOTE: Les institutions sont commitées à l'intérieur de cette fonction.
         import_metadata_to_db(session) 
         
         # 3. Importation des étudiants et des inscriptions
         import_inscriptions_to_db(session)
         
+        # 4. 🆕 DÉDUCTION ET INSERTION DE LA STRUCTURE TRANSVERSALE
+        _deduce_parcours_niveaux(session)
+        
         # Un commit final si tout s'est bien passé dans les orchestrateurs
-        # Les sous-fonctions gèrent leurs propres commits/rollbacks pour l'isolation
-        # session.commit() # Optionnel si les sous-fonctions font déjà les commits
+        session.commit() # Les sous-fonctions ont géré les commits nécessaires
 
         print("\n=====================================================")
         print("✅ IMPORTATION GLOBALE TERMINÉE (Vérifiez les logs d'erreurs)")
@@ -540,8 +609,3 @@ def import_all_data():
         print(f"\n❌ ERREUR FATALE dans l'orchestrateur principal: {e}", file=sys.stderr)
     finally:
         session.close()
-
-
-if __name__ == '__main__':
-    # Exécution de la fonction principale si le fichier est exécuté
-    import_all_data()

@@ -22,7 +22,10 @@ class Institution(Base):
     type_institution = Column(String(10), nullable=False)
     description = Column(Text, nullable=True)
     
-    # 🖼️ AJOUT DE CHAMP DE FICHIER
+    # 🆕 NOUVEAU CHAMP : ABBRÉVIATION
+    abbreviation = Column(String(20), nullable=True, unique=True) # Ex: UF
+    
+    # 🖼️ CHAMP DE FICHIER
     logo_path = Column(String(255), nullable=True)
     
     composantes = relationship("Composante", back_populates="institution")
@@ -36,7 +39,10 @@ class Composante(Base):
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
-    # 🖼️ AJOUT DE CHAMP DE FICHIER
+    # 🆕 NOUVEAU CHAMP : ABBRÉVIATION
+    abbreviation = Column(String(20), nullable=True) # Ex: ENI, FS, FLSH
+    
+    # 🖼️ CHAMP DE FICHIER
     logo_path = Column(String(255), nullable=True)
     
     id_institution = Column(String(32), ForeignKey('institutions.id_institution'), nullable=False) 
@@ -68,6 +74,9 @@ class Mention(Base):
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
+    # 🆕 NOUVEAU CHAMP : ABBRÉVIATION
+    abbreviation = Column(String(20), nullable=True) # Ex: MI (Maths Info), SVE (Sciences de la Vie)
+    
     # 🖼️ Ajout du champ de fichier pour Mention
     logo_path = Column(String(255), nullable=True) 
     
@@ -88,17 +97,55 @@ class Parcours(Base):
     label = Column(String(100))
     description = Column(Text, nullable=True) 
     
+    # 🆕 NOUVEAU CHAMP : ABBRÉVIATION
+    abbreviation = Column(String(20), nullable=True) # Ex: MISS, BMC, EC
+    
     # 🖼️ AJOUT DE CHAMP DE FICHIER
     logo_path = Column(String(255), nullable=True)
-    
-    mention_id = Column(String(50), ForeignKey('mentions.id_mention'), nullable=False)
     
     date_creation = Column(Integer, nullable=True)
     date_fin = Column(Integer, nullable=True)
 
+    mention_id = Column(String(50), ForeignKey('mentions.id_mention'), nullable=False)
+
+    # 🆕 NOUVELLE CLÉ ÉTRANGÈRE : Le type de formation par défaut du parcours
+    code_type_formation_defaut = Column(
+        String(10), 
+        ForeignKey('types_formation.code'), 
+        nullable=False, 
+        default='FI' # 👈 Valeur par défaut
+    )
+
+    # 🚨 Nouvelle relation vers TypeFormation
+    type_formation_defaut = relationship("TypeFormation", back_populates="parcours")
+    # 🆕 NOUVELLE RELATION : Pour lier le parcours aux niveaux (L1, M1, etc.)
+    niveaux_couverts = relationship("ParcoursNiveau", back_populates="parcours_lie")
+
 # -------------------------------------------------------------------
 # --- TABLES DE RÉFÉRENCE: STRUCTURE LMD (CYCLE, NIVEAU, SEMESTRE) ---
 # -------------------------------------------------------------------
+
+# --- TABLES D'ASSOCIATION ---
+class ParcoursNiveau(Base):
+    """ Table de liaison N:M entre un Parcours et les Niveaux (L1, M1, etc.) qu'il couvre. """
+    __tablename__ = 'parcours_niveaux'
+    __table_args__ = (
+        UniqueConstraint('id_parcours', 'code_niveau', name='uq_parcours_niveau_unique'),
+        {'extend_existing': True}
+    )
+    
+    id_parcours_niveau = Column(Integer, primary_key=True, autoincrement=True)
+    
+    # Clés étrangères
+    id_parcours = Column(String(50), ForeignKey('parcours.id_parcours'), nullable=False)
+    code_niveau = Column(String(10), ForeignKey('niveaux.code'), nullable=False)
+    
+    # 🆕 Ajout pour définir l'ordre du niveau dans le parcours (ex: L1=1, L2=2, M1=4)
+    ordre_niveau_parcours = Column(Integer, nullable=True) 
+
+    # Relations
+    parcours_lie = relationship("Parcours", back_populates="niveaux_couverts")
+    niveau_lie = relationship("Niveau", back_populates="parcours_associes")
 
 class Cycle(Base):
     __tablename__ = 'cycles'
@@ -121,6 +168,8 @@ class Niveau(Base):
     cycle = relationship("Cycle", back_populates="niveaux")
     
     semestres = relationship("Semestre", back_populates="niveau")
+    # 🆕 NOUVELLE RELATION : Pour lier le niveau aux parcours
+    parcours_associes = relationship("ParcoursNiveau", back_populates="niveau_lie")
     
 class Semestre(Base):
     __tablename__ = 'semestres'
@@ -223,8 +272,7 @@ class TypeFormation(Base):
     label = Column(String(50), nullable=False, unique=True)
     description = Column(Text, nullable=True)
     
-    # 🚨 Nouvelle relation : Pour lier aux inscriptions
-    inscriptions = relationship("Inscription", back_populates="type_formation")
+    parcours = relationship("Parcours", back_populates="type_formation_defaut")#
     
 
 # ===================================================================
@@ -311,7 +359,6 @@ class Inscription(Base):
     # Mise à jour de la clé étrangère
     code_mode_inscription = Column(String(10), ForeignKey('modes_inscription.code'), nullable=False) # 👈 CHANGEMENT DE TABLE RÉFÉRENCÉE et NOM DE COLONNE
     # 🚨 NOUVELLE CLÉ ÉTRANGÈRE : code_type_formation
-    code_type_formation = Column(String(10), ForeignKey('types_formation.code'), nullable=False, default='FI')
     
     # CREDIT et VALIDATION du SEMESTRE
     credit_acquis_semestre = Column(Integer, default=0) 
@@ -324,7 +371,6 @@ class Inscription(Base):
     semestre = relationship("Semestre", back_populates="inscriptions")
     # Mise à jour de la relation
     mode_inscription = relationship("ModeInscription", back_populates="inscriptions") 
-    type_formation = relationship("TypeFormation", back_populates="inscriptions")# 👈 CHANGEMENT DE NOM DE CLASSE ET DE RELATION
 
 
 class ResultatSemestre(Base):
