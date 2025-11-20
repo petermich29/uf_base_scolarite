@@ -17,13 +17,13 @@ class Institution(Base):
     __tablename__ = 'institutions'
     __table_args__ = {'extend_existing': True}
     
-    id_institution = Column(String(32), primary_key=True) 
+    id_institution = Column(String(32), primary_key=True, unique=True, nullable=False) 
     nom = Column(String(255), nullable=False, unique=True)
     type_institution = Column(String(10), nullable=False)
     description = Column(Text, nullable=True)
     
     # 🆕 NOUVEAU CHAMP : ABBRÉVIATION
-    abbreviation = Column(String(20), nullable=True, unique=True) # Ex: UF
+    abbreviation = Column(String(20), nullable=True) # Ex: UF
     
     # 🖼️ CHAMP DE FICHIER
     logo_path = Column(String(255), nullable=True)
